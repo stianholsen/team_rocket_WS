@@ -826,6 +826,8 @@ bool CaptureInterfacesDialog::saveOptionsToPreferences()
         /* Save the directory name for future file dialogs. */
         set_last_open_dir(get_dirname(filename.toUtf8().data()));
     } else {
+        /*Save the cleared path for next capture*/
+        global_capture_opts.orig_save_file = qstring_strdup(filename);
         /* User didn't specify a file; save to a temporary file. */
         global_capture_opts.save_file = NULL;
     }
