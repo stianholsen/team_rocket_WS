@@ -1216,11 +1216,6 @@
         <translation>Файл:</translation>
     </message>
     <message>
-        <source>Create a new file automatically after…</source>
-        <oldsource>Create a new file automatically after...</oldsource>
-        <translation>Автоматически создать новый файл после...</translation>
-    </message>
-    <message>
         <source>megabytes</source>
         <oldsource>Megabytes</oldsource>
         <translation>мегабайты</translation>
@@ -1314,20 +1309,6 @@
         <translation>Захватывать в постоянный файл</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Instead of using a single capture file, multiple files will be created.&lt;/p&gt;&lt;p&gt;The generated file names will contain an incrementing number and the start time of the capture.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Вместо использования одиночного файла захвата будет создано множество файлов.&lt;/p&gt;&lt;p&gt;Сгенерированные имена файлов будут содержать увеличивающееся на 1 значение и время начала захвата.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If the selected file size is exceeded, capturing switches to the next file.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: One option MUST be selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Если выбранный размер файла будет превышен, запись захваченных данных продолжится в следующий файл.&lt;/p&gt;&lt;p&gt;ОБРАТИТЕ ВНИМАНИЕ: Одна опция ДОЛЖНА быть выбрана.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>If the selected file size is exceeded, capturing switches to the next file.
-PLEASE NOTE: One option MUST be selected.</source>
-        <translation>Если выбранный размер файла будет превышен, запись захваченных данных продолжится в следующий файл.
-ОБРАТИТЕ ВНИМАНИЕ: Одна опция ДОЛЖНА быть выбрана.</translation>
-    </message>
-    <message>
         <source>gigabytes</source>
         <oldsource>Gigabytes</oldsource>
         <translation>гигабайты</translation>
@@ -1335,6 +1316,36 @@ PLEASE NOTE: One option MUST be selected.</source>
     <message>
         <source>Switch to the next file after the specified number of packets have been captured.</source>
         <translation>Переключить на следующий файл после достижения указанного числа захваченных пакетов.</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Instead of using a single capture file, multiple files will be created.&lt;/p&gt;&lt;p&gt;The generated file names will contain an incrementing number and the start time of the capture.&lt;/p&gt;&lt;p&gt;NOTE: If enabled, at least one of the new-file criteria MUST be selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Вместо использования одиночного файла захвата будет создано множество файлов.&lt;/p&gt;&lt;p&gt;Сгенерированные имена файлов будут содержать увеличивающееся на 1 значение и время начала захвата.&lt;/p&gt;&lt;p&gt;ОБРАТИТЬ ВНИМАНИЕ: Если включено, минимум один из критериев нового файла ДОЛЖЕН быть выбран.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Create a new file automatically…</source>
+        <translation>Автоматически создать новый файл...</translation>
+    </message>
+    <message>
+        <source>after</source>
+        <translation>после</translation>
+    </message>
+    <message>
+        <source>Switch to the next file after the file size exceeds the specified file size.</source>
+        <translation>Переключить на следующий файл после достижения размером файла указанного заранее размера.</translation>
+    </message>
+    <message>
+        <source>Switch to the next file when the time capturing to the current file exceeds the specified time.</source>
+        <translation>Переключить на следующий файл, когда время захвата в текущий файл превысит заранее указанное время.</translation>
+    </message>
+    <message>
+        <source>when time is a multiple of</source>
+        <translation>когда время - это множество</translation>
+    </message>
+    <message>
+        <source>Switch to the next file when the (wall clock) time is an even multiple of the specified interval.
+For example, use 1 hour to have a new file created every hour on the hour.</source>
+        <translation>Переключить на следующий файл, когда время (настенных часов) превысит указанный интервал.
+Например, используйте 1 час, чтобы получить новый файл, который создаётся на 1 час каждый час работы.</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After capturing has switched to the next file and the given number of files has exceeded, the oldest file will be removed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -2113,39 +2124,39 @@ PLEASE NOTE: One option MUST be selected.</source>
     <name>EndpointDialog</name>
     <message>
         <source>Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Карта</translation>
     </message>
     <message>
         <source>Draw IPv4 or IPv6 endpoints on a map.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вывести конечные точки IPv4 или IPv6 на карте.</translation>
     </message>
     <message>
         <source>Open in browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в браузере</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation type="unfinished">Сохранить Как</translation>
+        <translation>Сохранить Как</translation>
     </message>
     <message>
         <source>Map file error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка файла карты</translation>
     </message>
     <message>
         <source>No endpoints available to map</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет доступных конечных точек для размещения на карте</translation>
     </message>
     <message>
         <source>Unable to create temporary file</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать временный файл</translation>
     </message>
     <message>
         <source>Save Endpoints Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить Карту Конечных Точек</translation>
     </message>
     <message>
         <source>Failed to save map file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось сохранить файл карты %1.</translation>
     </message>
 </context>
 <context>
@@ -8333,7 +8344,7 @@ PLEASE NOTE: One option MUST be selected.</source>
     <name>PluginListModel</name>
     <message>
         <source>extcap</source>
-        <translation>extcap</translation>
+        <translation type="vanished">extcap</translation>
     </message>
     <message>
         <source>Name</source>
@@ -8507,6 +8518,10 @@ PLEASE NOTE: One option MUST be selected.</source>
     <message>
         <source>(system provided)</source>
         <translation>(системный)</translation>
+    </message>
+    <message>
+        <source>(deleted)</source>
+        <translation>(удалено)</translation>
     </message>
     <message>
         <source>Created from default settings</source>
@@ -12809,11 +12824,11 @@ PLEASE NOTE: One option MUST be selected.</source>
         <source>&lt;html&gt;&lt;head&gt;
 &lt;style&gt;
 a:link {
-  color: inherit;
+  color: palette(text);
   text-decoration: none;
 }
 a:hover {
-  color: inherit;
+  color: palette(text);
   text-decoration: underline;
 }
 &lt;/style&gt;
@@ -12840,11 +12855,11 @@ a:hover {
         <translation>&lt;html&gt;&lt;head&gt;
 &lt;style&gt;
 a:link {
-  color: inherit;
+  color: palette(text);
   text-decoration: none;
 }
 a:hover {
-  color: inherit;
+  color: palette(text);
   text-decoration: underline;
 }
 &lt;/style&gt;

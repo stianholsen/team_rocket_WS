@@ -79,6 +79,38 @@ class case_decrypt_80211(subprocesstest.SubprocessTestCase):
                 ))
         self.assertEqual(self.countOutput('ICMP.*Echo .ping'), 2)
 
+    def test_80211_wpa3_personal(self, cmd_tshark, capture_file):
+        '''IEEE 802.11 decode WPA3 personal / SAE'''
+        # Included in git sources test/captures/wpa3-sae.pcapng.gz
+        self.assertRun((cmd_tshark,
+                '-o', 'wlan.enable_decryption: TRUE',
+                '-r', capture_file('wpa3-sae.pcapng.gz'),
+                '-Y', 'wlan.analysis.tk == 20a2e28f4329208044f4d7edca9e20a6 || wlan.analysis.gtk == 1fc82f8813160031d6bf87bca22b6354',
+                ))
+        self.assertTrue(self.grepOutput('Who has 192.168.5.18'))
+        self.assertTrue(self.grepOutput('DHCP ACK'))
+
+    def test_80211_owe(self, cmd_tshark, capture_file):
+        '''IEEE 802.11 decode OWE'''
+        # Included in git sources test/captures/owe.pcapng.gz
+        self.assertRun((cmd_tshark,
+                '-o', 'wlan.enable_decryption: TRUE',
+                '-r', capture_file('owe.pcapng.gz'),
+                '-Y', 'wlan.analysis.tk == 10f3deccc00d5c8f629fba7a0fff34aa || wlan.analysis.gtk == 016b04ae9e6050bcc1f940dda9ffff2b',
+                ))
+        self.assertTrue(self.grepOutput('Who has 192.168.5.2'))
+        self.assertTrue(self.grepOutput('DHCP ACK'))
+
+    def test_80211_wpa1_gtk_rekey(self, cmd_tshark, capture_file):
+        '''Decode WPA1 with multiple GTK rekeys'''
+        # Included in git sources test/captures/wpa1-gtk-rekey.pcapng.gz
+        self.assertRun((cmd_tshark,
+                '-o', 'wlan.enable_decryption: TRUE',
+                '-r', capture_file('wpa1-gtk-rekey.pcapng.gz'),
+                '-Y', 'wlan.analysis.tk == "d0e57d224c1bb8806089d8c23154074c" || wlan.analysis.gtk == "6eaf63f4ad7997ced353723de3029f4d" || wlan.analysis.gtk == "fb42811bcb59b7845376246454fbdab7"',
+                ))
+        self.assertTrue(self.grepOutput('DHCP Discover'))
+        self.assertEqual(self.countOutput('ICMP.*Echo .ping'), 8)
 
 @fixtures.mark_usefixtures('test_env')
 @fixtures.uses_fixtures

@@ -519,13 +519,14 @@ dissect_PNDCP_Suboption_IP(tvbuff_t *tvb, int offset, packet_info *pinfo,
             ((service_id == PNDCP_SERVICE_ID_HELLO) && !is_response) ||
             ((service_id == PNDCP_SERVICE_ID_GET) && is_response)) {
             offset = dissect_pn_uint16(tvb, offset, pinfo, tree, hf_pn_dcp_block_info, &block_info);
+            have_block_info = TRUE;
             block_length -= 2;
         }
 
         /* BlockQualifier? */
         if ((service_id == PNDCP_SERVICE_ID_SET) && !is_response) {
             offset = dissect_pn_uint16(tvb, offset, pinfo, tree, hf_pn_dcp_block_qualifier, &block_qualifier);
-
+            have_block_qualifier = TRUE;
             block_length -= 2;
         }
 
@@ -1011,7 +1012,7 @@ dissect_PNDCP_Suboption_Control(tvbuff_t *tvb, int offset, packet_info *pinfo,
         pn_append_info(pinfo, dcp_item, ", Reset FactorySettings");
         proto_item_append_text(block_item, "Control/Reset FactorySettings");
         block_length -= 2;
-        offset = dissect_pn_uint16(tvb, offset, pinfo, tree, hf_pn_dcp_blockqualifier_r2f, &BlockQualifier);
+        offset = dissect_pn_uint16(tvb, offset, pinfo, tree, hf_pn_dcp_blockqualifier, &BlockQualifier);
         proto_item_append_text(block_item, ", BlockQualifier: %s",
             val_to_str(BlockQualifier, pn_dcp_suboption_other, "reserved"));
         block_length -= 2;

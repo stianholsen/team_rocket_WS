@@ -2016,6 +2016,7 @@ get_time_value(proto_tree *tree, tvbuff_t *tvb, const gint start,
 			break;
 
 		case ENC_TIME_MSECS|ENC_BIG_ENDIAN:
+		case ENC_TIME_MSECS|ENC_LITTLE_ENDIAN:
 			/*
 			 * Milliseconds, 1 to 8 bytes.
 			 * For absolute times, it's milliseconds since the
@@ -8112,7 +8113,7 @@ register_string_errors(void)
 	proto_set_cant_toggle(proto_string_errors);
 }
 
-#define PROTO_PRE_ALLOC_HF_FIELDS_MEM (210000+PRE_ALLOC_EXPERT_FIELDS_MEM)
+#define PROTO_PRE_ALLOC_HF_FIELDS_MEM (220000+PRE_ALLOC_EXPERT_FIELDS_MEM)
 static int
 proto_register_field_init(header_field_info *hfinfo, const int parent)
 {

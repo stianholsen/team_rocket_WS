@@ -285,13 +285,10 @@ void PacketList::colorsChanged()
     const QString c_active   = "active";
     const QString c_inactive = "!active";
 
-    QString default_style_format =
-        "QTreeView::item:selected:%1 {}";
-
     QString flat_style_format =
         "QTreeView::item:selected:%1 {"
         "  color: %2;"
-        "  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1 stop: 0 %3, stop: 1 %3);"
+        "  background-color: %3;"
         "}";
 
     QString gradient_style_format =
@@ -299,6 +296,23 @@ void PacketList::colorsChanged()
         "  color: %2;"
         "  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1 stop: 0 %4, stop: 0.5 %3, stop: 1 %4);"
         "}";
+
+    QString hover_style;
+#if !defined(Q_OS_WIN)
+#if defined(Q_OS_MAC)
+    QPalette default_pal = QApplication::palette();
+    default_pal.setCurrentColorGroup(QPalette::Active);
+    QColor hover_color = default_pal.highlight().color();
+#else
+    QColor hover_color = ColorUtils::alphaBlend(palette().window(), palette().highlight(), 0.5);
+#endif
+
+    hover_style = QString(
+        "QTreeView:item:hover {"
+        "  background-color: %1;"
+        "  color: palette(text);"
+        "}").arg(hover_color.name());
+#endif
 
     QString active_style   = QString();
     QString inactive_style = QString();
@@ -315,9 +329,8 @@ void PacketList::colorsChanged()
 
     if (prefs.gui_active_style == COLOR_STYLE_DEFAULT) {
         // ACTIVE = Default
-        active_style = default_style_format.arg(c_active);
     } else if (prefs.gui_active_style == COLOR_STYLE_FLAT) {
-        // ACTIVE = Flat OR Gradient
+        // ACTIVE = Flat
         QColor foreground = ColorUtils::fromColorT(prefs.gui_active_fg);
         QColor background = ColorUtils::fromColorT(prefs.gui_active_bg);
 
@@ -344,16 +357,33 @@ void PacketList::colorsChanged()
         if (style_inactive_selected) {
             QPalette inactive_pal = palette();
             inactive_pal.setCurrentColorGroup(QPalette::Inactive);
-
-            QColor foreground = inactive_pal.highlightedText().color();
-            QColor background = inactive_pal.highlight().color();
-
-            inactive_style = flat_style_format.arg(
-                                 c_inactive,
-                                 foreground.name(),
-                                 background.name());
-        } else {
-            inactive_style = default_style_format.arg(c_inactive);
+            QColor border = QColor::fromRgb(ColorUtils::alphaBlend(
+                                                    inactive_pal.highlightedText(),
+                                                    inactive_pal.highlight(),
+                                                    0.25));
+            QColor shadow = QColor::fromRgb(ColorUtils::alphaBlend(
+                                                    inactive_pal.highlightedText(),
+                                                    inactive_pal.highlight(),
+                                                    0.07));
+            inactive_style = QString(
+                              "QTreeView::item:selected:first:!active {"
+                              "  border-left: 1px solid %1;"
+                              "}"
+                              "QTreeView::item:selected:last:!active {"
+                              "  border-right: 1px solid %1;"
+                              "}"
+                              "QTreeView::item:selected:!active {"
+                              "  border-top: 1px solid %1;"
+                              "  border-bottom: 1px solid %1;"
+                              "  color: %2;"
+                              // Try to approximate a subtle box shadow.
+                              "  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1"
+                              "    stop: 0 %4, stop: 0.2 %3, stop: 0.8 %3, stop: 1 %4);"
+                              "}")
+                          .arg(border.name())
+                          .arg(inactive_pal.highlightedText().color().name())
+                          .arg(inactive_pal.highlight().color().name())
+                          .arg(shadow.name());
         }
     } else if (prefs.gui_inactive_style == COLOR_STYLE_FLAT) {
         // INACTIVE = Flat
@@ -378,7 +408,7 @@ void PacketList::colorsChanged()
     }
 
     // Set the style sheet
-    setStyleSheet(active_style + inactive_style);
+    setStyleSheet(active_style + inactive_style + hover_style);
 }
 
 void PacketList::drawRow (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const

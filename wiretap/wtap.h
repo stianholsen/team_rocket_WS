@@ -183,7 +183,7 @@ extern "C" {
 #define WTAP_ENCAP_SITA                         100
 #define WTAP_ENCAP_SCCP                         101
 #define WTAP_ENCAP_BLUETOOTH_HCI                102 /*raw packets without a transport layer header e.g. H4*/
-#define WTAP_ENCAP_IPMB                         103
+#define WTAP_ENCAP_IPMB_KONTRON                 103
 #define WTAP_ENCAP_IEEE802_15_4                 104
 #define WTAP_ENCAP_X2E_XORAYA                   105
 #define WTAP_ENCAP_FLEXRAY                      106
@@ -192,7 +192,7 @@ extern "C" {
 #define WTAP_ENCAP_CAN20B                       109
 #define WTAP_ENCAP_LAYER1_EVENT                 110
 #define WTAP_ENCAP_X2E_SERIAL                   111
-#define WTAP_ENCAP_I2C                          112
+#define WTAP_ENCAP_I2C_LINUX                    112
 #define WTAP_ENCAP_IEEE802_15_4_NONASK_PHY      113
 #define WTAP_ENCAP_TNEF                         114
 #define WTAP_ENCAP_USB_LINUX_MMAPPED            115
@@ -286,6 +286,7 @@ extern "C" {
 #define WTAP_ENCAP_SYSTEMD_JOURNAL              203 /* Event, not a packet */
 #define WTAP_ENCAP_EBHSCR                       204
 #define WTAP_ENCAP_VPP                          205
+#define WTAP_ENCAP_IEEE802_15_4_TAP             206
 
 /* After adding new item here, please also add new item to encap_table_base array */
 
@@ -1998,6 +1999,16 @@ WS_DLL_PUBLIC
 void wtap_dump_params_init(wtap_dump_params *params, wtap *wth);
 
 /**
+ * Remove any decryption secret information from the per-file information;
+ * used if we're stripping decryption secrets as we write the file.
+ *
+ * @param params The parameters for wtap_dump_* from which to remove the
+ * decryption secrets..
+ */
+WS_DLL_PUBLIC
+void wtap_dump_params_discard_decryption_secrets(wtap_dump_params *params);
+
+/**
  * Free memory associated with the wtap_dump_params when it is no longer in
  * use by wtap_dumper.
  *
@@ -2083,6 +2094,8 @@ WS_DLL_PUBLIC
 gboolean wtap_dump_set_addrinfo_list(wtap_dumper *wdh, addrinfo_lists_t *addrinfo_lists);
 WS_DLL_PUBLIC
 gboolean wtap_dump_get_needs_reload(wtap_dumper *wdh);
+WS_DLL_PUBLIC
+void wtap_dump_discard_decryption_secrets(wtap_dumper *wdh);
 
 /**
  * Closes open file handles and frees memory associated with wdh. Note that

@@ -5,7 +5,7 @@
 # The format used here is: <NUMERICAL_ID><SPACE><NAME>
 # Where SPACE can be any sequence of spaces and tabs.
 #
-# (last updated 2019-02-16)
+# (last updated 2019-03-30)
 
 0	Reserved
 1	NxNetworks
@@ -3561,7 +3561,7 @@
 3559	The Digital Schoolhouse
 3560	Sphere Logic Corporation
 3561	The Broadband Forum	# formerly 'ADSL Forum'
-3562	Selway Moore Limited
+3562	Jim Marsden Development	# formerly 'Selway Moore Limited'
 3563	National Network Data Services
 3564	Ciphernet
 3565	Grolier Interactive Europe On Line Groupe
@@ -6872,7 +6872,7 @@
 6887	IT-Conference
 6888	Millenium Installer
 6889	Avaya Communication
-6890	Shell Services International
+6890	Shell Information Technology International B.V.
 6891	Acepta.com
 6892	Cnation
 6893	TurboLinux, Inc.
@@ -8278,7 +8278,7 @@
 8297	IrisOnLine.com BV
 8298	v/h Nictoglobe
 8299	secunet Security Networks AG
-8300	State of Wisconsin - Security and Directory Services
+8300	State of Wisconsin - Network Access Management
 8301	Technische Universitaet Darmstadt
 8302	EdeNET Communications, Inc.
 8303	Gelco Information Network
@@ -9011,7 +9011,7 @@
 9032	IVSTel
 9033	Elion Enterprises Ltd
 9034	Jabber.com
-9035	Carlisle FoodService Products
+9035	CFS Brands, LLC
 9036	Jim Dutton
 9037	Everyday Office Inc.
 9038	Well Diagnostics
@@ -19113,7 +19113,7 @@
 19263	ET VOILA !!
 19264	Magnus Weis
 19265	Momentum Computer, Inc.
-19266	Bayerisches Landesamt für Statistik und Datenverarbeitung
+19266	Landesamt für Digitalisierung, Breitband und Vermessung	# formerly 'Bayerisches Landesamt für Statistik und Datenverarbeitung'
 19267	Ajuntament de Palma
 19268	Intercomp Ltd.
 19269	Hybrigenics SA
@@ -21931,7 +21931,7 @@
 22084	Industec Industria Metalurgica Ltda.
 22085	CIDE Consorcio para la Interoperabilidad de Documentos Electrónicos
 22086	Paul Poeltner
-22087	Invelica GmbH
+22087	Bodo Rueskamp
 22088	Alpine-Energie Holding AG
 22089	Paedagogische Hochschule Zentralschweiz
 22090	GCommerce Inc.
@@ -26321,7 +26321,7 @@
 26476	Advanced Devices S.p.A.
 26477	Uwe Perl
 26478	SI3SI
-26479	Schenck Process  GmbH
+26479	Schenck Process  Europe GmbH
 26480	infler.de
 26481	Zane C. Bowers
 26482	Rossonet S.r.l.
@@ -29342,7 +29342,7 @@
 29501	Algolith Inc.
 29502	MDIT Innovations Inc
 29503	GeniNetworks
-29504	SDC ek. för.
+29504	Biometria ek. för.
 29505	Resercom, L.P.
 29506	Telepin Software
 29507	InCoDe
@@ -34016,7 +34016,7 @@
 34180	Photop Technologies, Inc.
 34181	DARSHAN DUDHORIA
 34182	Area SX
-34183	Global Data Logistix (Pty) Ltd
+34183	Michael Karakashian	# formerly 'Global Data Logistix (Pty) Ltd'
 34184	Universität Hohenheim
 34185	EBANK ONLINE (BEIJING) TECHNOLOGY Co., LTD
 34186	TEAMCAST
@@ -35478,7 +35478,7 @@
 35644	Olson Consulting
 35645	ZiChen Tech. Co. Ltd.
 35646	Arca Technologies S.r.l.
-35647	Deposita Systems (Pty) Ltd
+35647	G4S Deposita (RF) (Pty) Ltd	# formerly 'Deposita Systems (Pty) Ltd'
 35648	Broadband Solutions Technology Pty Ltd
 35649	Direct Payment Solutions Limited
 35650	Piratenpartei Schweiz
@@ -43531,7 +43531,7 @@
 43707	Australian Rail Tecchnology
 43708	SimonMed Imaging
 43709	AirDSL (Pty) Ltd
-43710	GAMESA
+43710	Siemens Gamesa Renewable Energy	# formerly 'GAMESA'
 43711	mySupply ApS
 43712	Universidad Central de Venezuela
 43713	Code 42
@@ -44409,7 +44409,7 @@
 44585	Servato Corp
 44586	CommDev, LLC
 44587	InMechaSol
-44588	Kryptus Information Security Ltd.
+44588	Kryptus Information Security S/A
 44589	becker-ikt.de - Jochen Becker
 44590	Kevin Niehage
 44591	Morgan Hunt Ltd
@@ -45760,7 +45760,7 @@
 45938	Intelligent Visibility, Inc.
 45939	TRIMET S.A.
 45940	Beckman Library
-45941	Papa Malick MBOW
+45941	PM CONSULTING
 45942	ezVoice Telecom
 45943	Londelec UK Ltd
 45944	IT Telecom co.,Ltd
@@ -48211,7 +48211,7 @@
 48390	Bottomline Technologies
 48391	photicsensing
 48392	FilmLight Ltd
-48393	SDxLab
+48393	Sdx Lab Sdn. Bhd.	# formerly 'SDxLab'
 48394	br.Svensson Skog AB
 48395	Qimtronics
 48396	Sood sales
@@ -51781,7 +51781,7 @@
 51967	Smartweb s.r.o.
 51968	RobCo sp. z o.o.
 51969	Faraday&Future Inc.
-51970	Cloud9 Mobile Limited
+51970	Wireless Logic Limited
 51971	Confédération des Jeunes Chercheurs
 51972	RELEX
 51973	Raptor Engineering, LLC
@@ -53216,7 +53216,7 @@
 53404	The Orchard Enterprises NY, Inc.
 53405	QOS Networks
 53406	AB Habitat
-53407	COD5201
+53407	n5201
 53408	Thermomentum Ltd
 53409	VITRIA TECHNOLOGY INC
 53410	Technipad
@@ -53287,3 +53287,223 @@
 53475	North East Derbyshire District Council
 53476	Criminal Cases Review Commission
 53477	LST Forest AB
+53478	Everest Networks
+53479	Tjugoett och Trettio AB
+53480	Shanghai Horizon Information Tech. Co., Ltd.
+53481	Valmet
+53482	Economia a.s.
+53483	FOR-A ELETEX Co., Ltd.
+53484	KeySign NV
+53485	chinadaas.inc
+53486	LLC INTECH
+53487	Linkin Technology Co., Ltd.
+53488	Maeeko Cat Housing Ltd.
+53489	Institute Of Physics and Power Engineering
+53490	INVENTURE Automotive Electronics Research & Development, Inc
+53491	NPC SYSTEM
+53492	CapitalData
+53493	Sapcorda Services USA, Inc
+53494	Apex Clean Energy, Inc.
+53495	SIMS
+53496	OPTIMUS TELECOM
+53497	KosmosKosmos
+53498	QIC Global Services Limited
+53499	Austrian Airlines AG
+53500	IVES-SYSTEM Sp. z o. o.
+53501	DC IT-Consulting
+53502	RealexPayments
+53503	Sprint Federal Operations
+53504	Stephens College
+53505	TELERYS COMMUNICATION
+53506	Kaman Inc.
+53507	First Data Education Loans
+53508	Rhein-Neckar-Zeitung GmbH
+53509	Renaissance Lab
+53510	Zharfpouyan Toos
+53511	ubsafa
+53512	Bright Access
+53513	andosto GmbH & Co. KG
+53514	DPNIC
+53515	Medical Systems a.s.
+53516	DVZ Schwerin GMBH
+53517	edwinit
+53518	COASTAL CAROLINA FOOT & ANKLE ASSOCIATES,
+53519	w4v3
+53520	APW Business Services
+53521	Metis Aerospace Ltd
+53522	EnableBit
+53523	Hangzhou Infogo Technology Co.,Ltd
+53524	EmbedWay Technologies (Shanghai) Corporation
+53525	Centrum Onkologii im. prof. F. Łukaszczyka w Bydgoszczy
+53526	Dell ATC
+53527	Brideweir Systems
+53528	Viridian Group
+53529	Town of Los Gatos
+53530	Tracel
+53531	Glue Software Engineering AG
+53532	Kiratech Spa
+53533	Tenzor Tech Kft.
+53534	mediacomm
+53535	nanjing zoogho electronic technology co. LTD
+53536	Information Assurance Specialists, Inc.
+53537	PQ PLUS GmbH
+53538	Kreon Technology
+53539	Mycronic AB
+53540	Swimlane LLC
+53541	IPFX
+53542	Myntex Inc.
+53543	Knorr Bremse Services GmbH
+53544	XTRONIC GmbH
+53545	Rheinmetall AG
+53546	Nexapp Technologies Pvt Ltd
+53547	City of Saratoga
+53548	Chilldyne, Inc.
+53549	北京网藤科技有限公司 (Beijing Net Teng Technology Co., Ltd.)
+53550	Fire Financial Services Limited
+53551	Pensar Development
+53552	CAPREIT Limited Partnership
+53553	Arch Health Medical Group
+53554	Andynformatics
+53555	Asthma and Lung Clinic
+53556	RIWELA LTD
+53557	Networking Services
+53558	ordinator
+53559	GHIFARI160
+53560	Trustgrid
+53561	Toyota Motor Corporation Australia (CVS)
+53562	Nanjing WeiXiang Technology Limited Company
+53563	mit_waap
+53564	EHG Service GmbH
+53565	Knorr-Bremse Services GmbH
+53566	paul cumberworth
+53567	SYSOCO
+53568	MIT Manipal
+53569	COFEL
+53570	Beijing 6cloud Linsec Network Technology Co.,Ltd
+53571	ZYL
+53572	RF Designs
+53573	Alois Vitasek
+53574	Complex Service, LLC
+53575	Transmit.Live
+53576	Getslash GmbH
+53577	ARCTARUS LIMITED
+53578	Genesee Hematology Oncology
+53579	WaveFlex, Inc.
+53580	Within Reach Holding B.V.
+53581	BEYOND ORBIT LTD
+53582	DEAN
+53583	Cigna
+53584	DC Energy Management LP
+53585	BB&T Securities - Pershing
+53586	Specto Paineis Eletronicos Ltda
+53587	FIRESI s.r.o.
+53588	MIT_ACNT_MIB
+53589	LLEIDA S.A.S.
+53590	Eastone Century Technology Co，.Ltd.
+53591	TERAPRO
+53592	K M B systems, s.r.o.
+53593	Highways England
+53594	Protocol Labs
+53595	Lookback Inc
+53596	Cumulus Cloud Software and Consulting
+53597	StepStone Group
+53598	Avicenna.AI
+53599	Canfield Scientific, Inc.
+53600	KLIMEX Medical Ltd.
+53601	One Fylde
+53602	The Blue School
+53603	Immersion4 SA
+53604	Fieldfisher
+53605	Onur Mühendislik
+53606	Intralinks, inc
+53607	Enertech Global
+53608	OR.NET e.V.
+53609	KoCo Connector GmbH
+53610	B4ComTechnologies LLC
+53611	geOrchestra
+53612	Infinicomm Solutions
+53613	HAX Enterprises Ltd.
+53614	Frenzl IT-Services
+53615	TiTiT
+53616	pegase-cloud
+53617	Gravipet
+53618	Dalholm.net
+53619	Altomax LLC
+53620	Sensys Gatso Australia
+53621	Manipal Institute of Technology
+53622	DebOps
+53623	MIRAIT Corporation
+53624	SMS Informacionnye tekhnologii Ltd
+53625	Barrett Steel
+53626	Penzeys Spices
+53627	Rinicom Limited
+53628	California Dental Association
+53629	Beijing Zhicheng Co-Creation Information Technology Co., Ltd.
+53630	SunSpec Alliance
+53631	Vertrics microSistemas S.R.L.
+53632	De Data
+53633	voipGATE S.A.
+53634	Adyen N.V.
+53635	Matricis Informatique
+53636	Jonas Wahlberg
+53637	CL Networks Co., LTD.
+53638	Stern-Koblikowski Foundation
+53639	Fonestar Sistemas S.A.
+53640	Big Data Technology
+53641	AJ Bell Ltd
+53642	Sensys Gatso Group AB
+53643	Sayenko Kharenko
+53644	Tieto Czech s.r.o.
+53645	galis.org
+53646	AZG Tech GmbH
+53647	RAIDIX
+53648	Userman
+53649	Fuzhou Teraway Information Technology Co.,Ltd
+53650	Sekurbit Sverige AB
+53651	Backhaus Consulting GmbH
+53652	Staatsbosbeheer
+53653	DLM ELECTRONIQUE
+53654	D9 Technologies LLC
+53655	Propulsor Technology, Inc.
+53656	Pacific Radiology
+53657	CETC34
+53658	St. Raphael Cariats Alten und Behindertenhilfe GmbH
+53659	Safe Sky Industries, Inc.
+53660	EduCoach Consultants Inc
+53661	Here's work
+53662	KUZBASSHIMBANK
+53663	Serous
+53664	BLP Mobile Paint
+53665	BD Diesel Performance
+53666	Certograph Ltd
+53667	Biamino & Figli SPA
+53668	Synergetic Management Systems
+53669	Agena Bioscience
+53670	Silumin-Vostok, LLC
+53671	Forensic Risk Alliance Limited
+53672	Alturing
+53673	Coreit
+53674	FGUE STC Atlas
+53675	VESvault Corp
+53676	Eckelmann AG
+53677	PICA Group Pty Ltd
+53678	Brush New Zealand Limited
+53679	Bank of China Sydney Branch
+53680	fivetek
+53681	European Institute for Gender Equality
+53682	Ofcom
+53683	Cisco Sytems, Inc.
+53684	Circle Cardiovascular Imaging Inc.
+53685	neurodine.com
+53686	Saankhya Labs Pvt Ltd
+53687	6YS Pty Ltd
+53688	Toyota Tsusho Corporation
+53689	TAKEBISHI CORPORATION
+53690	LanRoad LLC
+53691	Citizens & Farmers Bank
+53692	Mount Pleasant Waterworks
+53693	Miami Pulmonary Specialists
+53694	CapSpecialty
+53695	AMC
+53696	BITECH SPA
+53697	Liceo Classico Statale "G.B. Morgagni"

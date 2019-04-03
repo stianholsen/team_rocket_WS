@@ -974,11 +974,11 @@ decode_dcerpc_binding_reset(const char *name _U_, gconstpointer pattern)
 }
 
 static gboolean
-dcerpc_decode_as_change(const char *name, gconstpointer pattern, gpointer handle, gchar* list_name)
+dcerpc_decode_as_change(const char *name, gconstpointer pattern, gconstpointer handle, const gchar* list_name)
 {
     const decode_dcerpc_bind_values_t *binding = (const decode_dcerpc_bind_values_t*)pattern;
     decode_dcerpc_bind_values_t *stored_binding;
-    guid_key     *key = *((guid_key**)handle);
+    guid_key     *key = *((guid_key *const *)handle);
 
     /* remove a probably existing old binding */
     decode_dcerpc_binding_reset(name, binding);
@@ -2628,13 +2628,8 @@ dissect_ndr_cvstring(tvbuff_t *tvb, int offset, packet_info *pinfo,
      */
     tvb_ensure_bytes_exist(tvb, offset, buffer_len);
     if (size_is == sizeof(guint16)) {
-        /*
-         * Assume little-endian UTF-16.
-         *
-         * XXX - is this always little-endian?
-         */
         s = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, buffer_len,
-                               ENC_UTF_16|ENC_LITTLE_ENDIAN);
+                               ENC_UTF_16|DREP_ENC_INTEGER(drep));
     } else {
         /*
          * XXX - what if size_is is neither 1 nor 2?
@@ -2808,13 +2803,8 @@ dissect_ndr_vstring(tvbuff_t *tvb, int offset, packet_info *pinfo,
      */
     tvb_ensure_bytes_exist(tvb, offset, buffer_len);
     if (size_is == sizeof(guint16)) {
-        /*
-         * Assume little-endian UTF-16.
-         *
-         * XXX - is this always little-endian?
-         */
         s = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, buffer_len,
-                               ENC_UTF_16|ENC_LITTLE_ENDIAN);
+                               ENC_UTF_16|DREP_ENC_INTEGER(drep));
     } else {
         /*
          * XXX - what if size_is is neither 1 nor 2?

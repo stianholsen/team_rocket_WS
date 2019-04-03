@@ -978,6 +978,7 @@ main(int argc, char *argv[])
 #ifdef HAVE_LUA
         wslua_plugins_dump_all();
 #endif
+        extcap_dump_all();
       }
       else if (strcmp(argv[2], "protocols") == 0)
         proto_registrar_dump_protocols();
@@ -2211,7 +2212,12 @@ main(int argc, char *argv[])
     cfile.provider.frames = NULL;
   }
 
-  draw_tap_listeners(TRUE);
+  /*
+   * If we never got a capture file, don't draw the taps; we not only
+   * didn't capture any packets, we never even did any capturing.
+   */
+  if (cfile.filename != NULL)
+    draw_tap_listeners(TRUE);
   /* Memory cleanup */
   reset_tap_listeners();
   funnel_dump_all_text_windows();
@@ -2536,7 +2542,7 @@ capture_input_error_message(capture_session *cap_session _U_, char *error_msg, c
 
 /* capture child detected an capture filter related error */
 void
-capture_input_cfilter_error_message(capture_session *cap_session, guint i, char *error_message)
+capture_input_cfilter_error_message(capture_session *cap_session, guint i, const char *error_message)
 {
   capture_options *capture_opts = cap_session->capture_opts;
   dfilter_t         *rfcode = NULL;
@@ -2781,7 +2787,7 @@ report_counts_siginfo(int signum _U_)
 
 /* capture child detected any packet drops? */
 void
-capture_input_drops(capture_session *cap_session _U_, guint32 dropped, char* interface_name)
+capture_input_drops(capture_session *cap_session _U_, guint32 dropped, const char* interface_name)
 {
   if (print_packet_counts) {
     /* We're printing packet counts to stderr.

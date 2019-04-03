@@ -328,6 +328,13 @@ wtap_dump_params_init(wtap_dump_params *params, wtap *wth)
 }
 
 void
+wtap_dump_params_discard_decryption_secrets(wtap_dump_params *params)
+{
+	params->dsbs_initial = NULL;
+	params->dsbs_growing = NULL;
+}
+
+void
 wtap_dump_params_cleanup(wtap_dump_params *params)
 {
 	wtap_block_array_free(params->shb_hdrs);
@@ -653,8 +660,8 @@ static struct encap_type_info encap_table_base[] = {
 	/* WTAP_ENCAP_BLUETOOTH_HCI */
 	{ "bluetooth-hci", "Bluetooth without transport layer" },
 
-	/* WTAP_ENCAP_IPMB */
-	{ "ipmb", "Intelligent Platform Management Bus" },
+	/* WTAP_ENCAP_IPMB_KONTRON */
+	{ "ipmb-kontron", "Intelligent Platform Management Bus with Kontron pseudo-header" },
 
 	/* WTAP_ENCAP_IEEE802_15_4 */
 	{ "wpan", "IEEE 802.15.4 Wireless PAN" },
@@ -680,8 +687,8 @@ static struct encap_type_info encap_table_base[] = {
 	/* WTAP_ENCAP_X2E_SERIAL */
 	{ "x2e-serial", "X2E serial line capture" },
 
-	/* WTAP_ENCAP_I2C */
-	{ "i2c", "I2C" },
+	/* WTAP_ENCAP_I2C_LINUX */
+	{ "i2c-linux", "I2C with Linux-specific pseudo-header" },
 
 	/* WTAP_ENCAP_IEEE802_15_4_NONASK_PHY */
 	{ "wpan-nonask-phy", "IEEE 802.15.4 Wireless PAN non-ASK PHY" },
@@ -961,6 +968,9 @@ static struct encap_type_info encap_table_base[] = {
 
 	/* WTAP_ENCAP_VPP */
 	{ "vpp", "Vector Packet Processing graph dispatch trace" },
+
+	/* WTAP_ENCAP_IEEE802_15_4_TAP */
+	{ "wpan-tap", "IEEE 802.15.4 Wireless with TAP pseudo-header" },
 };
 
 WS_DLL_LOCAL

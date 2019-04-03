@@ -1814,8 +1814,13 @@ static const true_false_string csa_initiator_flags = {
 };
 
 static const true_false_string mesh_config_cap_power_save_level_flags = {
-   "One of the peer-specific mesh power modes is deep sleep mode",
-   "No one is in deep sleep mode"
+   "At least one of the peer-specific mesh power modes is deep sleep mode",
+   "None of the peer-specific mesh power modes is deep sleep mode"
+};
+
+static const true_false_string ieee80211_qos_mesh_ps = {
+  "deep sleep mode",
+  "light sleep mode"
 };
 
 static const value_string sta_cf_pollable[] = {
@@ -3240,6 +3245,11 @@ static int hf_ieee80211_qos_highest_pri_buf_ac = -1;
 static int hf_ieee80211_qos_qap_buf_load = -1;
 static int hf_ieee80211_qos_txop_dur_req = -1;
 static int hf_ieee80211_qos_queue_size = -1;
+static int hf_ieee80211_qos_mesh_ctl_present = -1;
+static int hf_ieee80211_qos_mesh_ps_rsvd = -1;
+static int hf_ieee80211_qos_mesh_ps_unicast = -1;
+static int hf_ieee80211_qos_mesh_ps_multicast = -1;
+static int hf_ieee80211_qos_mesh_rspi = -1;
 
 /* ************************************************************************* */
 /*                Header values for HT control field (+HTC) and HE control   */
@@ -4902,7 +4912,8 @@ static int hf_ieee80211_vs_extreme_unknown = -1;
 static int hf_ieee80211_vs_extreme_ap_length = -1;
 static int hf_ieee80211_vs_extreme_ap_name = -1;
 
-static int hf_ieee80211_vs_aerohive_unknown = -1;
+static int hf_ieee80211_vs_aerohive_version = -1;
+static int hf_ieee80211_vs_aerohive_subtype = -1;
 static int hf_ieee80211_vs_aerohive_hostname_length = -1;
 static int hf_ieee80211_vs_aerohive_hostname = -1;
 static int hf_ieee80211_vs_aerohive_data = -1;
@@ -6058,6 +6069,8 @@ static expert_field ei_ieee80211_vs_routerboard_unexpected_len = EI_INIT;
 static expert_field ei_ieee80211_twt_tear_down_bad_neg_type = EI_INIT;
 static expert_field ei_ieee80211_twt_setup_not_supported_neg_type = EI_INIT;
 static expert_field ei_ieee80211_twt_setup_bad_command = EI_INIT;
+static expert_field ei_ieee80211_invalid_control_word = EI_INIT;
+static expert_field ei_ieee80211_invalid_control_id = EI_INIT;
 
 /* 802.11ad trees */
 static gint ett_dynamic_alloc_tree = -1;
@@ -12320,7 +12333,7 @@ static const int *he_mimo_control_headers[] = {
  * Handle compressed beamforming matrices and CQI
  */
 static guint
-dissect_compressed_beamforming_and_cqi(proto_tree *tree, tvbuff_t *tvb, packet_info *pinfo _U_, int offset)
+dissect_compressed_beamforming_and_cqi(proto_tree *tree, tvbuff_t *tvb, packet_info *pinfo, int offset)
 {
   int byte_count = 0;
   guint64 mimo_cntl = tvb_get_letoh40(tvb, offset);
@@ -12398,8 +12411,14 @@ dissect_compressed_beamforming_and_cqi(proto_tree *tree, tvbuff_t *tvb, packet_i
   scidx = SCIDX_END_SENTINAL;
   while ((scidx = next_he_scidx(scidx, bw, grouping, feedback,
           ru_start_index, ru_end_index)) != (int)SCIDX_END_SENTINAL) {
+    int prev_bit_offset = bit_offset;
     bit_offset = dissect_he_feedback_matrix(feedback_tree, tvb, offset,
                         bit_offset, scidx, nr, nc, phi_bits, psi_bits);
+    if (bit_offset <= prev_bit_offset) {
+      expert_add_info(pinfo, tree, &ei_ieee80211_bad_length);
+      break;
+    }
+
     offset = bit_offset / 8;
   }
 
@@ -13680,7 +13699,7 @@ dissect_hs20_indication(tvbuff_t *tvb, packet_info *pinfo _U_, proto_tree *tree,
 }
 
 static int
-dissect_owe_transition_mode(tvbuff_t *tvb, packet_info *pinfo _U_, proto_tree *tree, void* data _U_)
+dissect_owe_transition_mode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void* data _U_)
 {
   guint8 ssid_len;
 
@@ -14178,14 +14197,18 @@ dissect_vendor_ie_aerohive(proto_item *item _U_, proto_tree *ietree,
   offset += 1;
   tag_len -= 1;
 
+  proto_tree_add_item(ietree, hf_ieee80211_vs_aerohive_version, tvb, offset, 1, ENC_NA);
+  offset += 1;
+  tag_len -= 1;
+
   switch(type){
-    case AEROHIVE_HOSTNAME: /* Unknown (2 bytes) + Host Name Length (1 byte) + Host Name */
+    case AEROHIVE_HOSTNAME: /* Subtype (1 byte) + Host Name Length (1 byte) + Host Name */
 
       proto_item_append_text(item, ": %s", val_to_str_const(type, ieee80211_vs_aerohive_type_vals, "Unknown"));
 
-      proto_tree_add_item(ietree, hf_ieee80211_vs_aerohive_unknown, tvb, offset, 2, ENC_NA);
-      offset += 2;
-      tag_len -= 2;
+      proto_tree_add_item(ietree, hf_ieee80211_vs_aerohive_subtype, tvb, offset, 1, ENC_NA);
+      offset += 1;
+      tag_len -= 1;
 
       ti_len = proto_tree_add_item_ret_uint(ietree, hf_ieee80211_vs_aerohive_hostname_length, tvb, offset, 1, ENC_NA, &length);
       offset += 1;
@@ -17280,7 +17303,7 @@ dissect_a_control_cci(proto_tree *tree, tvbuff_t *tvb, int offset,
 }
 
 static void
-dissect_ht_control(proto_tree *tree, tvbuff_t *tvb, int offset)
+dissect_ht_control(packet_info* pinfo, proto_tree *tree, tvbuff_t *tvb, int offset)
 {
   proto_item *ti;
   proto_tree *htc_tree, *lac_subtree, *mfb_subtree;
@@ -17317,6 +17340,10 @@ dissect_ht_control(proto_tree *tree, tvbuff_t *tvb, int offset)
           proto_item_append_text(pi, ": %s",
                         val_to_str(control_id, a_control_control_id_vals,
                                         "Reserved (%u)"));
+        }
+        if (start_bit_offset > 31) {
+          expert_add_info(pinfo, a_control_tree, &ei_ieee80211_invalid_control_word);
+          break;
         }
         switch (control_id) {
         case A_CONTROL_TRS:
@@ -17356,7 +17383,7 @@ dissect_ht_control(proto_tree *tree, tvbuff_t *tvb, int offset)
           start_bit_offset += 8;
           break;
         default:
-          /* Add an expert info ... */
+          expert_add_info(pinfo, a_control_tree, &ei_ieee80211_invalid_control_id);
           start_bit_offset += 32;  /* Abandon */
           break;
         }
@@ -23853,7 +23880,7 @@ dissect_ieee80211_common(tvbuff_t *tvb, packet_info *pinfo,
           cw_tree = proto_tree_add_subtree(hdr_tree, tvb, offset, 2,
                       ett_cntrl_wrapper_fc, NULL, "Contained Frame Control");
           dissect_frame_control(cw_tree, tvb, 0, offset, pinfo);
-          dissect_ht_control(hdr_tree, tvb, offset + 2);
+          dissect_ht_control(pinfo, hdr_tree, tvb, offset + 2);
           offset += 6;
           hdr_tree = proto_tree_add_subtree(hdr_tree, tvb, offset, 2,
                       ett_cntrl_wrapper_fc, &cw_item, "Carried Frame");
@@ -24111,20 +24138,26 @@ dissect_ieee80211_common(tvbuff_t *tvb, packet_info *pinfo,
           DISSECTOR_ASSERT_NOT_REACHED();
       }
 
-
-
-      set_address_tvb(&pinfo->dl_src, wlan_address_type, 6, tvb, src_offset);
-      copy_address_shallow(&pinfo->src, &pinfo->dl_src);
-      set_address_tvb(&pinfo->dl_dst, wlan_address_type, 6, tvb, dst_offset);
-      copy_address_shallow(&pinfo->dst, &pinfo->dl_dst);
+      if (src_offset) {
+        set_address_tvb(&pinfo->dl_src, wlan_address_type, 6, tvb, src_offset);
+        copy_address_shallow(&pinfo->src, &pinfo->dl_src);
+      }
+      if (dst_offset) {
+        set_address_tvb(&pinfo->dl_dst, wlan_address_type, 6, tvb, dst_offset);
+        copy_address_shallow(&pinfo->dst, &pinfo->dl_dst);
+      }
 
       /* for tap */
       if (bssid_offset) {
         set_address_tvb(&whdr->bssid, wlan_bssid_address_type, 6, tvb, bssid_offset);
       }
 
-      copy_address_shallow(&whdr->src, &pinfo->dl_src);
-      copy_address_shallow(&whdr->dst, &pinfo->dl_dst);
+      if (src_offset) {
+        copy_address_shallow(&whdr->src, &pinfo->dl_src);
+      }
+      if (dst_offset) {
+        copy_address_shallow(&whdr->dst, &pinfo->dl_dst);
+      }
 
       seq_control = tvb_get_letohs(tvb, 22);
       frag_number = SEQCTL_FRAGMENT_NUMBER(seq_control);
@@ -24320,7 +24353,7 @@ dissect_ieee80211_common(tvbuff_t *tvb, packet_info *pinfo,
 
     case MGT_FRAME:
       if (htc_len == 4) {
-        dissect_ht_control(hdr_tree, tvb, ohdr_len - 4);
+        dissect_ht_control(pinfo, hdr_tree, tvb, ohdr_len - 4);
       }
       break;
 
@@ -24357,11 +24390,23 @@ dissect_ieee80211_common(tvbuff_t *tvb, packet_info *pinfo,
 
         proto_tree_add_item(qos_tree, hf_ieee80211_qos_ack_policy, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
 
-        if (flags & FLAG_FROM_DS) {
-          if (!DATA_FRAME_IS_NULL(frame_type_subtype)) {
-            proto_tree_add_item(qos_tree, hf_ieee80211_qos_amsdu_present, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
-            is_amsdu = QOS_AMSDU_PRESENT(qos_control);
+        if (!DATA_FRAME_IS_NULL(frame_type_subtype)) {
+          proto_tree_add_item(qos_tree, hf_ieee80211_qos_amsdu_present, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
+          is_amsdu = QOS_AMSDU_PRESENT(qos_control);
+        }
+
+        if (meshctl_len) {
+          proto_tree_add_item(qos_tree, hf_ieee80211_qos_mesh_ctl_present, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
+          if (POWER_MGT_STATUS(flags)) {
+            if (tvb_get_guint8(tvb, 4) & 0x1)
+              proto_tree_add_item(qos_tree, hf_ieee80211_qos_mesh_ps_multicast, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
+            else
+              proto_tree_add_item(qos_tree, hf_ieee80211_qos_mesh_ps_unicast, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
+          } else {
+            proto_tree_add_item(qos_tree, hf_ieee80211_qos_mesh_ps_rsvd, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
           }
+          proto_tree_add_item(qos_tree, hf_ieee80211_qos_mesh_rspi, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
+        } else if (flags & FLAG_FROM_DS) {
           if (DATA_FRAME_IS_CF_POLL(frame_type_subtype)) {
             /* txop limit */
               qos_ti = proto_tree_add_item(qos_tree, hf_ieee80211_qos_txop_limit, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
@@ -24399,10 +24444,6 @@ dissect_ieee80211_common(tvbuff_t *tvb, packet_info *pinfo,
             }
           }
         } else {
-          if (!DATA_FRAME_IS_NULL(frame_type_subtype)) {
-            proto_tree_add_item(qos_tree, hf_ieee80211_qos_amsdu_present, tvb, qosoff, 2, ENC_LITTLE_ENDIAN);
-            is_amsdu = QOS_AMSDU_PRESENT(qos_control);
-          }
           /*
            * Only QoS Data, Qos CF-ACK and NULL frames To-DS have a Queue Size
            * field.
@@ -24443,7 +24484,7 @@ dissect_ieee80211_common(tvbuff_t *tvb, packet_info *pinfo,
 
         /* Do we have +HTC? */
         if (htc_len == 4) {
-          dissect_ht_control(hdr_tree, tvb, ohdr_len - 4);
+          dissect_ht_control(pinfo, hdr_tree, tvb, ohdr_len - 4);
         }
 
       } /* end of qos control field */
@@ -25533,7 +25574,7 @@ dissect_wlan_rsna_eapol_wpa_or_rsn_key(tvbuff_t *tvb, packet_info *pinfo, proto_
 
         if (keydes_version == KEYDES_VER_TYPE1) {
           add_new_data_source(pinfo, next_tvb, "Decrypted RC4 keydata");
-        } else if (keydes_version == KEYDES_VER_TYPE2) {
+        } else {
           add_new_data_source(pinfo, next_tvb, "Decrypted AES keydata");
           int padding_len = keydata_padding_len(next_tvb);
           ieee_80211_add_tagged_parameters(next_tvb, 0, pinfo, keydes_tree,
@@ -25544,8 +25585,6 @@ dissect_wlan_rsna_eapol_wpa_or_rsn_key(tvbuff_t *tvb, packet_info *pinfo, proto_
                                 next_tvb, keydata_len - padding_len,
                                 padding_len, ENC_NA);
           }
-        } else {
-          /* TODO? */
         }
         /* Also add the PTK used to to decrypt and validate the keydata. */
         bytes_to_hexstr(out_buff, eapol->used_key.KeyData.Wpa.Ptk, 16); /* KCK is stored in PTK at offset 0 */
@@ -26072,6 +26111,31 @@ proto_register_ieee80211(void)
     {&hf_ieee80211_qos_queue_size,
      {"Queue Size", "wlan.qos.queue_size",
       FT_UINT16, BASE_DEC, NULL, 0xFF00,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_qos_mesh_ctl_present,
+     {"Mesh Control Present", "wlan.qos.mesh_ctl_present",
+      FT_UINT16, BASE_DEC, NULL, 0x0100,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_qos_mesh_ps_rsvd,
+     {"Mesh Power Save Level (reserved)", "wlan.qos.mesh_ps.reserved",
+      FT_UINT16, BASE_DEC, NULL, 0x0200,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_qos_mesh_ps_unicast,
+     {"Mesh Power Save Level (for the receiving peer)", "wlan.qos.mesh_ps.unicast",
+      FT_BOOLEAN, 16, TFS(&ieee80211_qos_mesh_ps), 0x0200,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_qos_mesh_ps_multicast,
+     {"Mesh Power Save Level (for all receiving peers)", "wlan.qos.mesh_ps.multicast",
+      FT_BOOLEAN, 16, TFS(&mesh_config_cap_power_save_level_flags), 0x0200,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_qos_mesh_rspi,
+     {"Receiver Service Period Initiated (RSPI)", "wlan.qos.mesh_rspi",
+      FT_UINT16, BASE_DEC, NULL, 0x0400,
       NULL, HFILL }},
 
     {&hf_ieee80211_fcs,
@@ -33691,9 +33755,14 @@ proto_register_ieee80211(void)
       NULL, HFILL }},
 
     /* Vendor Specific : Aerohive */
-    {&hf_ieee80211_vs_aerohive_unknown,
-     {"Unknown", "wlan.vs.aerohive.unknown",
-      FT_BYTES, BASE_NONE, NULL, 0,
+    {&hf_ieee80211_vs_aerohive_version,
+     {"Version", "wlan.vs.aerohive.version",
+      FT_UINT8, BASE_DEC, NULL, 0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_vs_aerohive_subtype,
+     {"Subtype", "wlan.vs.aerohive.subtype",
+      FT_UINT8, BASE_DEC, NULL, 0,
       NULL, HFILL }},
 
     {&hf_ieee80211_vs_aerohive_hostname_length,
@@ -37042,6 +37111,14 @@ proto_register_ieee80211(void)
     { &ei_ieee80211_twt_setup_bad_command,
       { "wlan.twt.setup_bad_command", PI_PROTOCOL, PI_ERROR,
         "This TWT Setup Command is not allowed, check the TWT Request field", EXPFILL }},
+
+    { &ei_ieee80211_invalid_control_word,
+      { "wlan.htc.he.a_control.invalid", PI_PROTOCOL, PI_MALFORMED,
+        "Invalid control word", EXPFILL }},
+
+    { &ei_ieee80211_invalid_control_id,
+      { "wlan.htc.he.a_control.ctrl_id.invalid", PI_PROTOCOL, PI_MALFORMED,
+        "Invalid control word", EXPFILL }},
   };
 
   expert_module_t *expert_ieee80211;

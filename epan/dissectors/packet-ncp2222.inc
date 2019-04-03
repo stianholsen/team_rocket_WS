@@ -6982,7 +6982,8 @@ ncp2222_compile_dfilters(void)
 void
 dissect_ncp_request(tvbuff_t *tvb, packet_info *pinfo,
                 guint32 nw_connection, guint8 sequence,
-                guint16 type, proto_tree *volatile ncp_tree)
+                guint16 type, gboolean is_lip_echo_allocate_slot,
+                proto_tree *volatile ncp_tree)
 {
     volatile guint8         func=0;
     volatile guint8         subfunc = 0;
@@ -6994,8 +6995,6 @@ dissect_ncp_request(tvbuff_t *tvb, packet_info *pinfo,
     ptvcursor_t             *volatile ptvc = NULL;
     proto_tree              *temp_tree = NULL;
     volatile gboolean       run_req_cond = FALSE;
-    guint32                 length_remaining;
-    guint32                 testvar;
     volatile unsigned long  exception_code;
     const char              *volatile message;
     proto_item              *ti;
@@ -7013,24 +7012,9 @@ dissect_ncp_request(tvbuff_t *tvb, packet_info *pinfo,
     /* Determine which ncp_record to use. */
     switch (type) {
     case NCP_ALLOCATE_SLOT:
-        length_remaining = tvb_captured_length_remaining(tvb, 4);
-        if (length_remaining > 4)
-        {
-            testvar = tvb_get_ntohl(tvb, 4);
-            if( testvar == 0x4c495020)
-            {
-                ncp_rec = &ncplip_echo;
-            }
-            else
-            {
-                ncp_rec = &ncp1111_request;
-                if (ncp_echo_conn) {
-                    expert_add_info(pinfo, NULL, &ei_ncp_connection_request);
-                }
-            }
-        }
-        else
-        {
+        if (is_lip_echo_allocate_slot) {
+            ncp_rec = &ncplip_echo;
+        } else {
             ncp_rec = &ncp1111_request;
             if (ncp_echo_conn) {
                 expert_add_info(pinfo, NULL, &ei_ncp_connection_request);
