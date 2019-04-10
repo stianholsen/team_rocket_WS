@@ -72,7 +72,7 @@ PrintDialog::PrintDialog(QWidget *parent, capture_file *cf) :
     print_bt_(new QPushButton(tr("&Print" UTF8_HORIZONTAL_ELLIPSIS))),
     cap_file_(cf),
     page_pos_(0),
-    in_preview_(FALSE)
+    in_preview_(false)
 {
     Q_ASSERT(cf);
 

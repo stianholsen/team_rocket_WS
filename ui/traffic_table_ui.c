@@ -22,7 +22,7 @@
 #include "wsutil/json_dumper.h"
 #endif
 
-const char *conv_column_titles[CONV_NUM_COLUMNS] = {
+const char *conv_column_titles[CONV_NUM_COLUMNS+1] = {
     "Address A",
     "Port A",
     "Address B",
@@ -36,7 +36,8 @@ const char *conv_column_titles[CONV_NUM_COLUMNS] = {
     "Rel Start",
     "Duration",
     "Bits/s A " UTF8_RIGHTWARDS_ARROW " B",
-    "Bits/s B " UTF8_RIGHTWARDS_ARROW " A"
+    "Bits/s B " UTF8_RIGHTWARDS_ARROW " A",
+    "Stream Number"
 };
 
 const char *conv_conn_a_title = "Connection A";

@@ -41,11 +41,12 @@ typedef enum {
     CONV_COLUMN_DURATION,
     CONV_COLUMN_BPS_AB,
     CONV_COLUMN_BPS_BA,
+    CONV_STREAM_NUM,
     CONV_NUM_COLUMNS,
     CONV_INDEX_COLUMN = CONV_NUM_COLUMNS
 } conversation_column_type_e;
 
-extern const char *conv_column_titles[CONV_NUM_COLUMNS];
+extern const char *conv_column_titles[CONV_NUM_COLUMNS+1];
 extern const char *conv_conn_a_title;
 extern const char *conv_conn_b_title;
 extern const char *conv_abs_start_title;

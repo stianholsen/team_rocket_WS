@@ -392,6 +392,10 @@ public:
                     bps_ba = gchar_free_to_qstring(format_size((gint64) conv_item->rx_bytes * 8 / duration, format_size_unit_none|format_size_prefix_si));
                 }
                 return bps_ba;
+            case CONV_STREAM_NUM:
+                {
+                    return (int)conv_item->conv_id;
+                }
             default:
                 return colData(column, resolve_names).toString();
             }
@@ -495,6 +499,8 @@ public:
             return bps_ab;
         case CONV_COLUMN_BPS_BA:
             return bps_ba;
+        case CONV_STREAM_NUM:
+           return (int)conv_item->conv_id;
         default:
             return QVariant();
         }
@@ -539,6 +545,8 @@ public:
             return conv_item->tx_bytes / conv_duration < other_item->tx_bytes / other_duration;
         case CONV_COLUMN_BPS_BA:
             return conv_item->rx_bytes / conv_duration < other_item->rx_bytes / other_duration;
+        case CONV_STREAM_NUM:
+                return (int)conv_item->conv_id;
         default:
             return false;
         }
@@ -572,20 +580,23 @@ ConversationTreeWidget::ConversationTreeWidget(QWidget *parent, register_ct_t* t
     setColumnCount(CONV_NUM_COLUMNS);
     setUniformRowHeights(true);
 
-    for (int i = 0; i < CONV_NUM_COLUMNS; i++) {
+    for (int i = 0; i < CONV_NUM_COLUMNS+1; i++) {
         headerItem()->setText(i, conv_column_titles[i]);
     }
 
     if (get_conversation_hide_ports(table_)) {
         hideColumn(CONV_COLUMN_SRC_PORT);
         hideColumn(CONV_COLUMN_DST_PORT);
+        hideColumn(CONV_STREAM_NUM);
     } else if (!strcmp(proto_get_protocol_filter_name(get_conversation_proto_id(table_)), "ncp")) {
         headerItem()->setText(CONV_COLUMN_SRC_PORT, conv_conn_a_title);
         headerItem()->setText(CONV_COLUMN_DST_PORT, conv_conn_b_title);
     }
+    
+    //Size of columns
 
     int one_en = fontMetrics().height() / 2;
-    for (int i = 0; i < CONV_NUM_COLUMNS; i++) {
+    for (int i = 0; i < CONV_NUM_COLUMNS+1; i++) {
         switch (i) {
         case CONV_COLUMN_SRC_ADDR:
         case CONV_COLUMN_DST_ADDR:
@@ -614,6 +625,10 @@ ConversationTreeWidget::ConversationTreeWidget(QWidget *parent, register_ct_t* t
         case CONV_COLUMN_BPS_AB:
         case CONV_COLUMN_BPS_BA:
             setColumnWidth(i, one_en * (int) strlen("000 k"));
+            break;
+        case CONV_STREAM_NUM:
+                resizeColumnToContents(i);
+            //setColumnWidth(i, one_en * (int) strlen("Stream Number"));
             break;
         default:
             setColumnWidth(i, one_en * 5);
