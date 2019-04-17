@@ -625,8 +625,8 @@ ConversationTreeWidget::ConversationTreeWidget(QWidget *parent, register_ct_t* t
             setColumnWidth(i, one_en * (int) strlen("000 k"));
             break;
         case CONV_STREAM_NUM:
-                //resizeColumnToContents(i);
-            setColumnWidth(i, one_en * (int) strlen("Stream Number"));
+            resizeColumnToContents(i);
+            //setColumnWidth(i, one_en * (int) strlen("Stream Number"));
             break;
         default:
             setColumnWidth(i, one_en * 5);
