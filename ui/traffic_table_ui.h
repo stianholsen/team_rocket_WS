@@ -27,6 +27,7 @@ extern "C" {
  */
 
 typedef enum {
+    CONV_STREAM_NUM,
     CONV_COLUMN_SRC_ADDR,
     CONV_COLUMN_SRC_PORT,
     CONV_COLUMN_DST_ADDR,
@@ -41,7 +42,6 @@ typedef enum {
     CONV_COLUMN_DURATION,
     CONV_COLUMN_BPS_AB,
     CONV_COLUMN_BPS_BA,
-    CONV_STREAM_NUM,
     CONV_NUM_COLUMNS,
     CONV_INDEX_COLUMN = CONV_NUM_COLUMNS
 } conversation_column_type_e;

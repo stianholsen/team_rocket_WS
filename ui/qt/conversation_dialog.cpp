@@ -344,6 +344,8 @@ public:
             QString bps_ab = bps_na_, bps_ba = bps_na_;
 
             switch (column) {
+            case CONV_STREAM_NUM:
+                return (int)conv_item->conv_id;
             case CONV_COLUMN_PACKETS:
                 return QString("%L1").arg(conv_item->tx_frames + conv_item->rx_frames);
             case CONV_COLUMN_BYTES:
@@ -392,10 +394,6 @@ public:
                     bps_ba = gchar_free_to_qstring(format_size((gint64) conv_item->rx_bytes * 8 / duration, format_size_unit_none|format_size_prefix_si));
                 }
                 return bps_ba;
-            case CONV_STREAM_NUM:
-                {
-                    return (int)conv_item->conv_id;
-                }
             default:
                 return colData(column, resolve_names).toString();
             }
@@ -447,6 +445,8 @@ public:
         }
 
         switch (col) {
+        case CONV_STREAM_NUM:
+            return (int)conv_item->conv_id;
         case CONV_COLUMN_SRC_ADDR:
             {
             char* addr_str = get_conversation_address(NULL, &conv_item->src_address, resolve_names);
@@ -499,8 +499,6 @@ public:
             return bps_ab;
         case CONV_COLUMN_BPS_BA:
             return bps_ba;
-        case CONV_STREAM_NUM:
-           return (int)conv_item->conv_id;
         default:
             return QVariant();
         }
@@ -517,6 +515,8 @@ public:
         double other_duration = nstime_to_sec(&other_item->stop_time) - nstime_to_sec(&other_item->start_time);
 
         switch(sort_col) {
+        case CONV_STREAM_NUM:
+            return (int)conv_item->conv_id;
         case CONV_COLUMN_SRC_ADDR:
             return cmp_address(&conv_item->src_address, &other_item->src_address) < 0 ? true : false;
         case CONV_COLUMN_SRC_PORT:
@@ -545,8 +545,6 @@ public:
             return conv_item->tx_bytes / conv_duration < other_item->tx_bytes / other_duration;
         case CONV_COLUMN_BPS_BA:
             return conv_item->rx_bytes / conv_duration < other_item->rx_bytes / other_duration;
-        case CONV_STREAM_NUM:
-                return (int)conv_item->conv_id;
         default:
             return false;
         }
@@ -627,8 +625,8 @@ ConversationTreeWidget::ConversationTreeWidget(QWidget *parent, register_ct_t* t
             setColumnWidth(i, one_en * (int) strlen("000 k"));
             break;
         case CONV_STREAM_NUM:
-                resizeColumnToContents(i);
-            //setColumnWidth(i, one_en * (int) strlen("Stream Number"));
+                //resizeColumnToContents(i);
+            setColumnWidth(i, one_en * (int) strlen("Stream Number"));
             break;
         default:
             setColumnWidth(i, one_en * 5);

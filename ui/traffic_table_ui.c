@@ -23,6 +23,7 @@
 #endif
 
 const char *conv_column_titles[CONV_NUM_COLUMNS+1] = {
+    "Stream Number",
     "Address A",
     "Port A",
     "Address B",
@@ -36,8 +37,7 @@ const char *conv_column_titles[CONV_NUM_COLUMNS+1] = {
     "Rel Start",
     "Duration",
     "Bits/s A " UTF8_RIGHTWARDS_ARROW " B",
-    "Bits/s B " UTF8_RIGHTWARDS_ARROW " A",
-    "Stream Number"
+    "Bits/s B " UTF8_RIGHTWARDS_ARROW " A"
 };
 
 const char *conv_conn_a_title = "Connection A";
