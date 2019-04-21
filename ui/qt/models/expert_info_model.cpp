@@ -249,7 +249,7 @@ QVariant ExpertInfoModel::data(const QModelIndex &index, int role) const
     case colSummary:
         if (index.parent().isValid())
         {
-            if (QString(val_to_str_const(item->severity(), expert_severity_vals, "Unknown")) == "Comment")
+            if (item->severity() == 1048576)
                 return item->summary().simplified();
 
             if (group_by_summary_)
@@ -261,7 +261,7 @@ QVariant ExpertInfoModel::data(const QModelIndex &index, int role) const
         {
             if (group_by_summary_)
             {
-                if (QString(val_to_str_const(item->severity(), expert_severity_vals, "Unknown")) == "Comment")
+                if (item->severity() == 1048576)
                     return "Packet comments listed below.";
                 return item->summary().simplified();
             }
