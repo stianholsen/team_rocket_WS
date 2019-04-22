@@ -263,7 +263,6 @@ QVariant ExpertInfoModel::data(const QModelIndex &index, int role) const
                 if (item->severity() == PI_COMMENT)
                     return "Packet comments listed below.";
                 return item->summary().simplified();
-
             }
         }
         return QVariant();
