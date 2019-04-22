@@ -248,7 +248,7 @@ QVariant ExpertInfoModel::data(const QModelIndex &index, int role) const
         return QString(val_to_str_const(item->severity(), expert_severity_vals, "Unknown"));
     case colSummary:
         if (index.parent().isValid())
-        
+        {
             if (item->severity() == PI_COMMENT)
                 return item->summary().simplified();
 
