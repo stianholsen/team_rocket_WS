@@ -10,31 +10,31 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-/** @defgroup main_window_group Main window
- * The main window has the following submodules:
-   @dot
-  digraph main_dependencies {
-      node [shape=record, fontname=Helvetica, fontsize=10];
-      main [ label="main window" URL="\ref main.h"];
-      menu [ label="menubar" URL="\ref menus.h"];
-      toolbar [ label="toolbar" URL="\ref main_toolbar.h"];
-      packet_list [ label="packet list pane" URL="\ref packet_list.h"];
-      proto_draw [ label="packet details & bytes panes" URL="\ref main_proto_draw.h"];
-      recent [ label="recent user settings" URL="\ref recent.h"];
-      main -> menu [ arrowhead="open", style="solid" ];
-      main -> toolbar [ arrowhead="open", style="solid" ];
-      main -> packet_list [ arrowhead="open", style="solid" ];
-      main -> proto_draw [ arrowhead="open", style="solid" ];
-      main -> recent [ arrowhead="open", style="solid" ];
-  }
-  @enddot
- */
+ /** @defgroup main_window_group Main window
+  * The main window has the following submodules:
+    @dot
+   digraph main_dependencies {
+       node [shape=record, fontname=Helvetica, fontsize=10];
+       main [ label="main window" URL="\ref main.h"];
+       menu [ label="menubar" URL="\ref menus.h"];
+       toolbar [ label="toolbar" URL="\ref main_toolbar.h"];
+       packet_list [ label="packet list pane" URL="\ref packet_list.h"];
+       proto_draw [ label="packet details & bytes panes" URL="\ref main_proto_draw.h"];
+       recent [ label="recent user settings" URL="\ref recent.h"];
+       main -> menu [ arrowhead="open", style="solid" ];
+       main -> toolbar [ arrowhead="open", style="solid" ];
+       main -> packet_list [ arrowhead="open", style="solid" ];
+       main -> proto_draw [ arrowhead="open", style="solid" ];
+       main -> recent [ arrowhead="open", style="solid" ];
+   }
+   @enddot
+  */
 
-/** @file
- *  The main window
- *  @ingroup main_window_group
- *  @ingroup windows_group
- */
+  /** @file
+   *  The main window
+   *  @ingroup main_window_group
+   *  @ingroup windows_group
+   */
 
 #include <stdio.h>
 
@@ -68,6 +68,7 @@
 
 #include "capture_file.h"
 #include "capture_file_dialog.h"
+#include "print_dialog.h"
 #include "capture_file_properties_dialog.h"
 #include <ui/qt/utils/field_information.h>
 #include <ui/qt/widgets/display_filter_combo.h>
@@ -78,6 +79,7 @@
 class AccordionFrame;
 class ByteViewTab;
 class CaptureInterfacesDialog;
+class PrintDialog;
 class FileSetDialog;
 class FilterDialog;
 class FunnelStatistics;
@@ -200,6 +202,7 @@ private:
 #ifdef HAVE_LIBPCAP
     capture_session cap_session_;
     CaptureInterfacesDialog *capture_interfaces_dialog_;
+    PrintDialog *pdlg_;
     info_data_t info_data_;
 #endif
     FilterDialog *display_filter_dlg_;
@@ -296,7 +299,7 @@ public slots:
      * @param type File type.
      * @return True on success, false on failure.
      */
-    // XXX We might want to return a cf_read_status_t or a CaptureFile.
+     // XXX We might want to return a cf_read_status_t or a CaptureFile.
     bool openCaptureFile(QString cf_path, QString display_filter, unsigned int type, gboolean is_tempfile = FALSE);
     bool openCaptureFile(QString cf_path = QString(), QString display_filter = QString()) { return openCaptureFile(cf_path, display_filter, WTAP_TYPE_AUTO); }
     void filterPackets(QString new_filter = QString(), bool force = false);
@@ -327,7 +330,7 @@ public slots:
     void captureFileClosed();
 
     void launchRLCGraph(bool channelKnown, guint16 ueid, guint8 rlcMode,
-                        guint16 channelType, guint16 channelId, guint8 direction);
+        guint16 channelType, guint16 channelId, guint8 direction);
 
     void on_actionViewFullScreen_triggered(bool checked);
 
