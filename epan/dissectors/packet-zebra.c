@@ -1234,7 +1234,7 @@ zebra_route(proto_tree *tree, gboolean request, tvbuff_t *tvb, int offset,
 				   MIN((unsigned)PSIZE(srcprefixlen),
 				       sizeof srcbuffer6));
 			proto_tree_add_ipv6(tree, hf_zebra_srcprefix6, tvb,
-					    offset, PSIZE(prefixlen),
+					    offset, PSIZE(srcprefixlen),
 					    (ws_in6_addr *)srcbuffer6);
 		} else if (family == ZEBRA_FAMILY_IPV4) {
 			prefix4 = 0;
@@ -2276,7 +2276,7 @@ dissect_zebra(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void* data _U
 		zebra_tree = proto_item_add_subtree(ti, ett_zebra);
 		ti = proto_tree_add_boolean(zebra_tree, hf_zebra_request,
 					    tvb, offset, 0, request);
-		PROTO_ITEM_SET_HIDDEN(ti);
+		proto_item_set_hidden(ti);
 
 		for (;;) {
 			guint8 		headermarker, version;

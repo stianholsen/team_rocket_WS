@@ -20,6 +20,7 @@
 #include <epan/packet.h>
 #include <epan/to_str.h>
 #include <epan/uat.h>
+#include <epan/strutil.h>
 #include <wsutil/str_util.h>
 
 #include "packet-http.h"
@@ -624,7 +625,7 @@ addValueInterpretations(tvbuff_t *tvb, proto_tree *tlv_tree, lwm2mElement_t *ele
 		{
 			const guint8 *strval;
 			proto_tree_add_item_ret_string(tlv_tree, *resource->hf_id, tvb, valueOffset, element->length_of_value, ENC_UTF_8, wmem_packet_scope(), &strval);
-			proto_item_append_text(tlv_tree, ": %s", strval);
+			proto_item_append_text(tlv_tree, ": %s", format_text(wmem_packet_scope(), strval, strlen(strval)));
 			break;
 		}
 		case DATA_TYPE_INTEGER:
@@ -717,7 +718,7 @@ addValueTree(tvbuff_t *tvb, proto_tree *tlv_tree, lwm2mElement_t *element, const
 
 	if (resource && (element->type == RESOURCE || element->type == RESOURCE_ARRAY)) {
 		proto_item *ti = proto_tree_add_string(tlv_tree, hf_lwm2mtlv_resource_name, tvb, 0, 0, resource->name);
-		PROTO_ITEM_SET_GENERATED(ti);
+		proto_item_set_generated(ti);
 	}
 
 	if ( element->type == RESOURCE || element->type == RESOURCE_INSTANCE ) {
@@ -883,7 +884,7 @@ dissect_lwm2mtlv(tvbuff_t *tvb, packet_info *pinfo _U_, proto_tree *tree, void *
 
 			if (object_name && object_name[0]) {
 				proto_item *ti = proto_tree_add_string(lwm2mtlv_tree, hf_lwm2mtlv_object_name, tvb, 0, 0, object_name);
-				PROTO_ITEM_SET_GENERATED(ti);
+				proto_item_set_generated(ti);
 				proto_item_append_text(lwm2mtlv_item, ", %s", object_name);
 			}
 		}

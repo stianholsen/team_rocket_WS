@@ -1357,7 +1357,7 @@ static const ssl_alpn_prefix_match_protocol_t ssl_alpn_prefix_match_protocols[] 
 
 const value_string compress_certificate_algorithm_vals[] = {
     { 1, "zlib" },
-    { 2, "broli" },
+    { 2, "brotli" },
     { 0, NULL }
 };
 
@@ -6631,6 +6631,7 @@ ssl_dissect_hnd_hello_ext_quic_transport_parameters(ssl_common_dissect_t *hf, tv
      *     opaque value<0..2^16-1>;
      *  } TransportParameter;
      *
+     *  // draft -18 and before
      *  struct {
      *      select (Handshake.msg_type) {
      *          case client_hello:
@@ -6642,6 +6643,9 @@ ssl_dissect_hnd_hello_ext_quic_transport_parameters(ssl_common_dissect_t *hf, tv
      *      };
      *      TransportParameter parameters<0..2^16-1>;
      *  } TransportParameters;
+     *
+     *  // since draft 19
+     *  TransportParameter TransportParameters<0..2^16-1>;
      *
      *  // draft -17 and before
      *  struct {
@@ -6662,39 +6666,43 @@ ssl_dissect_hnd_hello_ext_quic_transport_parameters(ssl_common_dissect_t *hf, tv
      *    opaque statelessResetToken[16];
      *  } PreferredAddress;
      */
-    switch (hnd_type) {
-    case SSL_HND_CLIENT_HELLO:
-        proto_tree_add_item(tree, hf->hf.hs_ext_quictp_initial_version,
-                            tvb, offset, 4, ENC_BIG_ENDIAN);
-        offset += 4;
-        break;
-    case SSL_HND_ENCRYPTED_EXTENSIONS:
-        proto_tree_add_item(tree, hf->hf.hs_ext_quictp_negotiated_version,
-                            tvb, offset, 4, ENC_BIG_ENDIAN);
-        offset += 4;
-        /* QuicVersion supported_versions<4..2^8-4>;*/
-        if (!ssl_add_vector(hf, tvb, pinfo, tree, offset, offset_end, &supported_versions_length,
-                            hf->hf.hs_ext_quictp_supported_versions_len, 4, G_MAXUINT8-3)) {
-            return offset_end;
-        }
-        offset += 1;
-        next_offset = offset + supported_versions_length;
-
-        while (offset < next_offset) {
-            proto_tree_add_item(tree, hf->hf.hs_ext_quictp_supported_versions,
+    // Heuristically detect draft -18 vs draft -19.
+    if (offset_end - offset >= 4 && tvb_get_ntoh24(tvb, offset) == 0xff0000) {
+        // Draft -18 and before start with a (draft) version field.
+        switch (hnd_type) {
+        case SSL_HND_CLIENT_HELLO:
+            proto_tree_add_item(tree, hf->hf.hs_ext_quictp_initial_version,
                                 tvb, offset, 4, ENC_BIG_ENDIAN);
             offset += 4;
+            break;
+        case SSL_HND_ENCRYPTED_EXTENSIONS:
+            proto_tree_add_item(tree, hf->hf.hs_ext_quictp_negotiated_version,
+                                tvb, offset, 4, ENC_BIG_ENDIAN);
+            offset += 4;
+            /* QuicVersion supported_versions<4..2^8-4>;*/
+            if (!ssl_add_vector(hf, tvb, pinfo, tree, offset, offset_end, &supported_versions_length,
+                                hf->hf.hs_ext_quictp_supported_versions_len, 4, G_MAXUINT8-3)) {
+                return offset_end;
+            }
+            offset += 1;
+            next_offset = offset + supported_versions_length;
+
+            while (offset < next_offset) {
+                proto_tree_add_item(tree, hf->hf.hs_ext_quictp_supported_versions,
+                                    tvb, offset, 4, ENC_BIG_ENDIAN);
+                offset += 4;
+            }
+            break;
+        case SSL_HND_NEWSESSION_TICKET:
+            break;
+        default:
+            return offset;
         }
-        break;
-    case SSL_HND_NEWSESSION_TICKET:
-        break;
-    default:
-        return offset;
     }
 
-    /* TransportParameter parameters<22..2^16-1>; */
+    /* TransportParameter TransportParameters<0..2^16-1>; */
     if (!ssl_add_vector(hf, tvb, pinfo, tree, offset, offset_end, &quic_length,
-                        hf->hf.hs_ext_quictp_len, 22, G_MAXUINT16)) {
+                        hf->hf.hs_ext_quictp_len, 0, G_MAXUINT16)) {
         return offset_end;
     }
     offset += 2;
@@ -6737,7 +6745,7 @@ ssl_dissect_hnd_hello_ext_quic_transport_parameters(ssl_common_dissect_t *hf, tv
             case SSL_HND_QUIC_TP_IDLE_TIMEOUT:
                 proto_tree_add_item_ret_varint(parameter_tree, hf->hf.hs_ext_quictp_parameter_idle_timeout,
                                                tvb, offset, -1, ENC_VARINT_QUIC, &value, &len);
-                proto_item_append_text(parameter_tree, " %" G_GINT64_MODIFIER "u secs", value);
+                proto_item_append_text(parameter_tree, " %" G_GINT64_MODIFIER "u ms", value);
                 offset += len;
             break;
             case SSL_HND_QUIC_TP_STATELESS_RESET_TOKEN:
@@ -7560,11 +7568,21 @@ ssl_set_cipher(SslDecryptSession *ssl, guint16 cipher)
     /* store selected cipher suite for decryption */
     ssl->session.cipher = cipher;
 
-    if (!(ssl->cipher_suite = ssl_find_cipher(cipher))) {
+    const SslCipherSuite *cs = ssl_find_cipher(cipher);
+    if (!cs) {
+        ssl->cipher_suite = NULL;
         ssl->state &= ~SSL_CIPHER;
         ssl_debug_printf("%s can't find cipher suite 0x%04X\n", G_STRFUNC, cipher);
+    } else if (ssl->session.version == SSLV3_VERSION && !(cs->dig == DIG_MD5 || cs->dig == DIG_SHA)) {
+        /* A malicious packet capture contains a SSL 3.0 session using a TLS 1.2
+         * cipher suite that uses for example MACAlgorithm SHA256. Reject that
+         * to avoid a potential buffer overflow in ssl3_check_mac. */
+        ssl->cipher_suite = NULL;
+        ssl->state &= ~SSL_CIPHER;
+        ssl_debug_printf("%s invalid SSL 3.0 cipher suite 0x%04X\n", G_STRFUNC, cipher);
     } else {
         /* Cipher found, save this for the delayed decoder init */
+        ssl->cipher_suite = cs;
         ssl->state |= SSL_CIPHER;
         ssl_debug_printf("%s found CIPHER 0x%04X %s -> state 0x%02X\n", G_STRFUNC, cipher,
                          val_to_str_ext_const(cipher, &ssl_31_ciphersuite_ext, "unknown"),

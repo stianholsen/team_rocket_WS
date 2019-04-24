@@ -51,6 +51,8 @@ since version 3.0.0:
 // Add one protocol per line between the -- delimiters.
 [commaize]
 --
+evolved Common Public Radio Interface (eCPRI)
+Distributed Replicated Block Device (DRBD)
 --
 
 === Updated Protocol Support

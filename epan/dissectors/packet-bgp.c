@@ -44,6 +44,7 @@
  *     in EVPN
  * draft-ietf-idr-bgp-prefix-sid-05
  * http://www.iana.org/assignments/bgp-parameters/ (last updated 2012-04-26)
+ * RFC8538 Notification Message Support for BGP Graceful Restart
 
  * TODO:
  * Destination Preference Attribute for BGP (work in progress)
@@ -123,6 +124,7 @@ static dissector_handle_t bgp_handle;
 
 /* BGP MPLS information */
 #define BGP_MPLS_BOTTOM_L_STACK 0x000001
+#define BGP_MPLS_LABEL          0xFFFFF0
 
 /* AS_PATH segment types */
 #define AS_SET             1   /* RFC1771 */
@@ -689,6 +691,18 @@ static dissector_handle_t bgp_handle;
 #define BGP_LS_SR_SUBTLV_BINDING_IPV6_BAK_ERO       1167
 #define BGP_LS_SR_SUBTLV_BINDING_UNNUM_IFID_BAK_ERO 1168
 
+/* RFC8571 BGP-LS Advertisement of IGP TE Metric Extensions */
+#define BGP_LS_IGP_TE_METRIC_DELAY                  1114
+#define BGP_LS_IGP_TE_METRIC_DELAY_MIN_MAX          1115
+#define BGP_LS_IGP_TE_METRIC_DELAY_VARIATION        1116
+#define BGP_LS_IGP_TE_METRIC_LOSS                   1117
+#define BGP_LS_IGP_TE_METRIC_BANDWIDTH_RESIDUAL     1118
+#define BGP_LS_IGP_TE_METRIC_BANDWIDTH_AVAILABLE    1119
+#define BGP_LS_IGP_TE_METRIC_BANDWIDTH_UTILIZED     1120
+
+#define BGP_LS_IGP_TE_METRIC_FLAG_A                 0x80
+#define BGP_LS_IGP_TE_METRIC_FLAG_RESERVED          0x7F
+
 /* Prefix-SID TLV flags, draft-gredler-idr-bgp-ls-segment-routing-ext-01:
 
                              0  1  2  3  4  5  6  7
@@ -854,6 +868,7 @@ static const value_string bgpnotify_minor_cease[] = {
     { 6, "Other Configuration Change"},
     { 7, "Connection Collision Resolution"},
     { 8, "Out of Resources"},
+    { 9, "Hard Reset"},
     { 0, NULL }
 };
 
@@ -1493,6 +1508,7 @@ static int hf_bgp_cap_enh_safi = -1;
 static int hf_bgp_cap_enh_nhafi = -1;
 static int hf_bgp_cap_gr_timers = -1;
 static int hf_bgp_cap_gr_timers_restart_flag = -1;
+static int hf_bgp_cap_gr_timers_notification_flag = -1;
 static int hf_bgp_cap_gr_timers_restart_time = -1;
 static int hf_bgp_cap_gr_afi = -1;
 static int hf_bgp_cap_gr_safi = -1;
@@ -2028,6 +2044,33 @@ static int hf_bgp_ext_com_eigrp_e_asn = -1;
 static int hf_bgp_ext_com_eigrp_e_rid = -1;
 static int hf_bgp_ext_com_eigrp_e_pid = -1;
 static int hf_bgp_ext_com_eigrp_e_m = -1;
+
+/* RFC8571 BGP-LS Advertisement of IGP TE Metric Extensions */
+static int hf_bgp_ls_igp_te_metric_flags = -1;
+static int hf_bgp_ls_igp_te_metric_flags_a = -1;
+static int hf_bgp_ls_igp_te_metric_flags_reserved = -1;
+static int hf_bgp_ls_igp_te_metric_delay = -1;
+static int hf_bgp_ls_igp_te_metric_delay_value = -1;
+static int hf_bgp_ls_igp_te_metric_delay_min_max = -1;
+static int hf_bgp_ls_igp_te_metric_delay_min = -1;
+static int hf_bgp_ls_igp_te_metric_delay_max = -1;
+static int hf_bgp_ls_igp_te_metric_delay_variation = -1;
+static int hf_bgp_ls_igp_te_metric_delay_variation_value = -1;
+static int hf_bgp_ls_igp_te_metric_link_loss = -1;
+static int hf_bgp_ls_igp_te_metric_link_loss_value = -1;
+static int hf_bgp_ls_igp_te_metric_bandwidth_residual = -1;
+static int hf_bgp_ls_igp_te_metric_bandwidth_residual_value = -1;
+static int hf_bgp_ls_igp_te_metric_bandwidth_available = -1;
+static int hf_bgp_ls_igp_te_metric_bandwidth_available_value = -1;
+static int hf_bgp_ls_igp_te_metric_bandwidth_utilized = -1;
+static int hf_bgp_ls_igp_te_metric_bandwidth_utilized_value = -1;
+static int hf_bgp_ls_igp_te_metric_reserved = -1;
+
+static const int *ls_igp_te_metric_flags[] = {
+       &hf_bgp_ls_igp_te_metric_flags_a,
+       &hf_bgp_ls_igp_te_metric_flags_reserved,
+       NULL
+       };
 
 static gint ett_bgp = -1;
 static gint ett_bgp_prefix = -1;
@@ -4477,6 +4520,51 @@ decode_link_state_attribute_tlv(proto_tree *tree, tvbuff_t *tvb, gint offset, pa
         case BGP_LS_SR_TLV_BINDING_SID:
             break;
 
+        case BGP_LS_IGP_TE_METRIC_DELAY:
+            tlv_item = proto_tree_add_item(tree, hf_bgp_ls_igp_te_metric_delay, tvb, offset, length+4, ENC_NA);
+            tlv_tree = proto_item_add_subtree(tlv_item, ett_bgp_link_state);
+            proto_tree_add_bitmask(tlv_tree, tvb, offset, hf_bgp_ls_igp_te_metric_flags,
+                                   ett_bgp_link_state, ls_igp_te_metric_flags, ENC_BIG_ENDIAN);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_delay_value, tvb, offset + 1, 3, ENC_BIG_ENDIAN);
+            break;
+        case BGP_LS_IGP_TE_METRIC_DELAY_MIN_MAX:
+            tlv_item = proto_tree_add_item(tree, hf_bgp_ls_igp_te_metric_delay_min_max, tvb, offset, length+4, ENC_NA);
+            tlv_tree = proto_item_add_subtree(tlv_item, ett_bgp_link_state);
+            proto_tree_add_bitmask(tlv_tree, tvb, offset, hf_bgp_ls_igp_te_metric_flags,
+                                   ett_bgp_link_state, ls_igp_te_metric_flags, ENC_BIG_ENDIAN);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_delay_min, tvb, offset + 1, 3, ENC_BIG_ENDIAN);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_reserved, tvb, offset + 4, 1, ENC_BIG_ENDIAN);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_delay_max, tvb, offset + 5, 3, ENC_BIG_ENDIAN);
+            break;
+        case BGP_LS_IGP_TE_METRIC_DELAY_VARIATION:
+            tlv_item = proto_tree_add_item(tree, hf_bgp_ls_igp_te_metric_delay_variation, tvb, offset, length+4, ENC_NA);
+            tlv_tree = proto_item_add_subtree(tlv_item, ett_bgp_link_state);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_reserved, tvb, offset, 1, ENC_BIG_ENDIAN);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_delay_variation_value, tvb, offset + 1, 3, ENC_BIG_ENDIAN);
+            break;
+        case BGP_LS_IGP_TE_METRIC_LOSS:
+            tlv_item = proto_tree_add_item(tree, hf_bgp_ls_igp_te_metric_link_loss, tvb, offset, length+4, ENC_NA);
+            tlv_tree = proto_item_add_subtree(tlv_item, ett_bgp_link_state);
+            proto_tree_add_bitmask(tlv_tree, tvb, offset, hf_bgp_ls_igp_te_metric_flags,
+                                   ett_bgp_link_state, ls_igp_te_metric_flags, ENC_BIG_ENDIAN);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_link_loss_value, tvb, offset + 1, 3, ENC_BIG_ENDIAN);
+            break;
+        case BGP_LS_IGP_TE_METRIC_BANDWIDTH_RESIDUAL:
+            tlv_item = proto_tree_add_item(tree, hf_bgp_ls_igp_te_metric_bandwidth_residual, tvb, offset, length+4, ENC_NA);
+            tlv_tree = proto_item_add_subtree(tlv_item, ett_bgp_link_state);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_bandwidth_residual_value, tvb, offset, 4, ENC_BIG_ENDIAN);
+            break;
+        case BGP_LS_IGP_TE_METRIC_BANDWIDTH_AVAILABLE:
+            tlv_item = proto_tree_add_item(tree, hf_bgp_ls_igp_te_metric_bandwidth_available, tvb, offset, length+4, ENC_NA);
+            tlv_tree = proto_item_add_subtree(tlv_item, ett_bgp_link_state);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_bandwidth_available_value, tvb, offset, 4, ENC_BIG_ENDIAN);
+            break;
+        case BGP_LS_IGP_TE_METRIC_BANDWIDTH_UTILIZED:
+            tlv_item = proto_tree_add_item(tree, hf_bgp_ls_igp_te_metric_bandwidth_utilized, tvb, offset, length+4, ENC_NA);
+            tlv_tree = proto_item_add_subtree(tlv_item, ett_bgp_link_state);
+            proto_tree_add_item(tlv_tree, hf_bgp_ls_igp_te_metric_bandwidth_utilized_value, tvb, offset, 4, ENC_BIG_ENDIAN);
+            break;
+
         default:
             expert_add_info_format(pinfo, tree, &ei_bgp_ls_error,
                 "Unknown Prefix Descriptor TLV Code (%u)!", type);
@@ -4561,12 +4649,10 @@ static int decode_evpn_nlri(proto_tree *tree, tvbuff_t *tvb, gint offset, packet
     proto_tree *prefix_tree;
     proto_item *ti;
     guint8 route_type;
-    guint labnum;
     guint8 nlri_len;
     guint8 ip_len;
     guint32 total_length = 0;
     proto_item *item;
-    wmem_strbuf_t *stack_strbuf; /* label stack                  */
 
     route_type = tvb_get_guint8(tvb, offset);
 
@@ -4616,11 +4702,7 @@ static int decode_evpn_nlri(proto_tree *tree, tvbuff_t *tvb, gint offset, packet
         proto_tree_add_item(prefix_tree, hf_bgp_evpn_nlri_etag, tvb, reader_offset,
                                    4, ENC_BIG_ENDIAN);
         reader_offset += 4;
-        stack_strbuf = wmem_strbuf_new_label(wmem_packet_scope());
-        labnum = decode_MPLS_stack(tvb, reader_offset,
-                stack_strbuf);
-        proto_tree_add_string(prefix_tree, hf_bgp_evpn_nlri_mpls_ls1, tvb, reader_offset,
-                                   labnum*3, wmem_strbuf_get_str(stack_strbuf));
+        proto_tree_add_item(prefix_tree, hf_bgp_evpn_nlri_mpls_ls1, tvb, reader_offset, 3, ENC_BIG_ENDIAN);
         reader_offset += 3;
         total_length = reader_offset - offset;
         break;
@@ -4705,18 +4787,12 @@ static int decode_evpn_nlri(proto_tree *tree, tvbuff_t *tvb, gint offset, packet
         } else {
             return -1;
         }
-        stack_strbuf = wmem_strbuf_new_label(wmem_packet_scope());
-        labnum = decode_MPLS_stack(tvb, reader_offset, stack_strbuf);
-        proto_tree_add_string(prefix_tree, hf_bgp_evpn_nlri_mpls_ls1, tvb, reader_offset,
-                                   labnum*3, wmem_strbuf_get_str(stack_strbuf));
+        proto_tree_add_item(prefix_tree, hf_bgp_evpn_nlri_mpls_ls1, tvb, reader_offset, 3, ENC_BIG_ENDIAN);
         reader_offset += 3;
         /* we check if we reached the end of the nlri reading fields one by one */
         /* if not, the second optional label is in the payload */
         if (reader_offset - start_offset < nlri_len) {
-            stack_strbuf = wmem_strbuf_new_label(wmem_packet_scope());
-            labnum = decode_MPLS_stack(tvb, reader_offset, stack_strbuf);
-            proto_tree_add_string(prefix_tree, hf_bgp_evpn_nlri_mpls_ls2, tvb, reader_offset,
-                                   labnum*3, wmem_strbuf_get_str(stack_strbuf));
+            proto_tree_add_item(prefix_tree, hf_bgp_evpn_nlri_mpls_ls2, tvb, reader_offset, 3, ENC_BIG_ENDIAN);
             reader_offset += 3;
         }
         total_length = reader_offset - offset;
@@ -5793,6 +5869,7 @@ dissect_bgp_capability_item(tvbuff_t *tvb, proto_tree *tree, packet_info *pinfo,
 
                 static const int * timer_flags[] = {
                     &hf_bgp_cap_gr_timers_restart_flag,
+                    &hf_bgp_cap_gr_timers_notification_flag,
                     &hf_bgp_cap_gr_timers_restart_time,
                     NULL
                 };
@@ -8587,8 +8664,11 @@ proto_register_bgp(void)
         { "Restart Timers", "bgp.cap.gr.timers", FT_UINT16, BASE_HEX,
           NULL, 0x0, NULL, HFILL }},
       { &hf_bgp_cap_gr_timers_restart_flag,
-        { "Restart", "bgp.cap.gr.timers.restart_flag", FT_BOOLEAN, 16,
+        { "Restart state", "bgp.cap.gr.timers.restart_flag", FT_BOOLEAN, 16,
           TFS(&tfs_yes_no), 0x8000, NULL, HFILL }},
+      { &hf_bgp_cap_gr_timers_notification_flag,
+        { "Graceful notification", "bgp.cap.gr.timers.notification_flag", FT_BOOLEAN, 16,
+          TFS(&tfs_yes_no), 0x4000, NULL, HFILL }},
       { &hf_bgp_cap_gr_timers_restart_time,
         { "Time", "bgp.cap.gr.timers.restart_time", FT_UINT16, BASE_DEC,
           NULL, 0x0FFF, "in us", HFILL }},
@@ -8793,7 +8873,7 @@ proto_register_bgp(void)
           BASE_NONE, NULL, 0x0, NULL, HFILL}},
       { &hf_bgp_update_mpls_label_value_20bits,
         { "MPLS Label", "bgp.update.path_attribute.mpls_label_value_20bits", FT_UINT24,
-          BASE_DEC, NULL, 0xFFFFF0, NULL, HFILL}},
+          BASE_DEC, NULL, BGP_MPLS_LABEL, NULL, HFILL}},
       { &hf_bgp_update_mpls_label_value,
         { "MPLS Label", "bgp.update.path_attribute.mpls_label_value", FT_UINT24,
           BASE_DEC, NULL, 0x0, NULL, HFILL}},
@@ -9890,11 +9970,11 @@ proto_register_bgp(void)
        { "Ethernet Tag ID", "bgp.evpn.nlri.etag", FT_UINT32,
           BASE_DEC, NULL, 0x0, NULL, HFILL}},
       { &hf_bgp_evpn_nlri_mpls_ls1,
-        { "MPLS Label Stack 1", "bgp.evpn.nlri.mpls_ls1", FT_STRING,
-          BASE_NONE, NULL, 0x0, NULL, HFILL}},
+        { "MPLS Label 1", "bgp.evpn.nlri.mpls_ls1", FT_UINT24,
+          BASE_DEC, NULL, BGP_MPLS_LABEL, NULL, HFILL}},
       { &hf_bgp_evpn_nlri_mpls_ls2,
-        { "MPLS Label Stack 2", "bgp.evpn.nlri.mpls_ls2", FT_STRING,
-          BASE_NONE, NULL, 0x0, NULL, HFILL}},
+        { "MPLS Label 2", "bgp.evpn.nlri.mpls_ls2", FT_UINT24,
+          BASE_DEC, NULL, BGP_MPLS_LABEL, NULL, HFILL}},
       { &hf_bgp_evpn_nlri_maclen,
        { "MAC Address Length", "bgp.evpn.nlri.maclen", FT_UINT8,
           BASE_DEC, NULL, 0x0, NULL, HFILL}},
@@ -10036,7 +10116,64 @@ proto_register_bgp(void)
           BASE_DEC, NULL, 0x0FFFFF, NULL, HFILL}},
       { &hf_bgp_ls_sr_tlv_adjacency_sid_index,
         { "SID/Index", "bgp.ls.sr.tlv.adjacency.sid.index", FT_UINT32,
-          BASE_DEC, NULL, 0x0, NULL, HFILL}}
+          BASE_DEC, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_flags,
+        { "TE Metric Flags", "bgp.ls.igp_te_metric.flags", FT_UINT8,
+          BASE_HEX, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_flags_a,
+        { "Anomalous (A) bit", "bgp.ls.igp_te_metric.flags.a", FT_BOOLEAN,
+          8, TFS(&tfs_set_notset), BGP_LS_IGP_TE_METRIC_FLAG_A, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_flags_reserved,
+        { "Reserved", "bgp.ls.igp_te_metric.flags.reserved", FT_UINT8,
+          BASE_HEX, NULL, BGP_LS_IGP_TE_METRIC_FLAG_RESERVED, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_delay,
+        { "Unidirectional Link Delay TLV", "bgp.ls.igp_te_metric.delay", FT_NONE,
+          BASE_NONE, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_delay_value,
+        { "Delay", "bgp.ls.igp_te_metric.delay_value", FT_UINT24,
+          BASE_DEC, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_delay_min_max,
+        { "Min/Max Unidirectional Link Delay TLV", "bgp.ls.igp_te_metric.delay_min_max", FT_NONE,
+          BASE_NONE, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_delay_min,
+        { "Min Delay", "bgp.ls.igp_te_metric.delay_min", FT_UINT24,
+          BASE_DEC, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_delay_max,
+        { "Max Delay", "bgp.ls.igp_te_metric.delay_max", FT_UINT24,
+          BASE_DEC, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_delay_variation,
+        { "Unidirectional Delay Variation TLV", "bgp.ls.igp_te_metric.delay_variation", FT_NONE,
+          BASE_NONE, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_delay_variation_value,
+        { "Delay Variation", "bgp.ls.igp_te_metric.delay_variation_value", FT_UINT24,
+          BASE_DEC, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_link_loss,
+        { "Unidirectional Link Loss TLV", "bgp.ls.igp_te_metric.link_loss", FT_NONE,
+          BASE_NONE, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_link_loss_value,
+        { "Link Loss", "bgp.ls.igp_te_metric.link_loss_value", FT_UINT24,
+          BASE_DEC, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_bandwidth_residual,
+        { "Unidirectional Residual Bandwidth TLV", "bgp.ls.igp_te_metric.residual_bandwidth", FT_NONE,
+          BASE_NONE, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_bandwidth_residual_value,
+        { "Residual Bandwidth", "bgp.ls.igp_te_metric.residual_bandwidth_value", FT_UINT32,
+          BASE_DEC, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_bandwidth_available,
+        { "Unidirectional Available Bandwidth TLV", "bgp.ls.igp_te_metric.available_bandwidth", FT_NONE,
+          BASE_NONE, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_bandwidth_available_value,
+        { "Residual Bandwidth", "bgp.ls.igp_te_metric.available_bandwidth_value", FT_UINT32,
+          BASE_DEC, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_bandwidth_utilized,
+        { "Unidirectional Utilized Bandwidth TLV", "bgp.ls.igp_te_metric.utilized_bandwidth", FT_NONE,
+          BASE_NONE, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_bandwidth_utilized_value,
+        { "Utilized Bandwidth", "bgp.ls.igp_te_metric.utilized_bandwidth_value", FT_UINT32,
+          BASE_DEC, NULL, 0x0, NULL, HFILL}},
+      { &hf_bgp_ls_igp_te_metric_reserved,
+        { "Reserved", "bgp.ls.igp_te_metric.reserved", FT_UINT8,
+          BASE_HEX, NULL, 0x0, NULL, HFILL}}
 };
 
     static gint *ett[] = {

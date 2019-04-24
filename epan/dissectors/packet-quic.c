@@ -12,8 +12,8 @@
 
 /*
  * See https://quicwg.org
- * https://tools.ietf.org/html/draft-ietf-quic-transport-17
- * https://tools.ietf.org/html/draft-ietf-quic-tls-17
+ * https://tools.ietf.org/html/draft-ietf-quic-transport-18
+ * https://tools.ietf.org/html/draft-ietf-quic-tls-18
  * https://tools.ietf.org/html/draft-ietf-quic-invariants-03
  */
 
@@ -306,6 +306,7 @@ const value_string quic_version_vals[] = {
     { 0xff000010, "draft-16" },
     { 0xff000011, "draft-17" },
     { 0xff000012, "draft-18" },
+    { 0xff000013, "draft-19" },
     { 0, NULL }
 };
 
@@ -424,7 +425,7 @@ static const range_string quic_transport_error_code_vals[] = {
     { 0x0006, 0x0006, "FINAL_SIZE_ERROR" },
     { 0x0007, 0x0007, "FRAME_ENCODING_ERROR" },
     { 0x0008, 0x0008, "TRANSPORT_PARAMETER_ERROR" },
-    { 0x0009, 0x0009, "VERSION_NEGOTIATION_ERROR" },
+    { 0x0009, 0x0009, "VERSION_NEGOTIATION_ERROR" }, // removed in draft -19
     { 0x000A, 0x000A, "PROTOCOL_VIOLATION" },
     { 0x000C, 0x000C, "INVALID_MIGRATION" },
     { 0x0100, 0x01FF, "CRYPTO_ERROR" },
@@ -899,7 +900,7 @@ dissect_quic_frame_type(tvbuff_t *tvb, packet_info *pinfo, proto_tree *quic_tree
              * sake let's combine multiple zeroes into a single field. */
             pad_len = 1 + tvb_skip_guint8(tvb, offset, tvb_reported_length_remaining(tvb, offset), '\0') - offset;
             ti = proto_tree_add_uint(ft_tree, hf_quic_padding_length, tvb, offset, 0, pad_len);
-            PROTO_ITEM_SET_GENERATED(ti);
+            proto_item_set_generated(ti);
             proto_item_append_text(ti_ft, " Length: %u", pad_len);
             offset += pad_len - 1;
         }
@@ -1758,7 +1759,7 @@ quic_add_connection_info(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, qu
     }
 
     pi = proto_tree_add_uint(ctree, hf_quic_connection_number, tvb, 0, 0, conn->number);
-    PROTO_ITEM_SET_GENERATED(pi);
+    proto_item_set_generated(pi);
 #if 0
     proto_tree_add_debug_text(ctree, "Client CID: %s", cid_to_string(&conn->client_cids.data));
     proto_tree_add_debug_text(ctree, "Server CID: %s", cid_to_string(&conn->server_cids.data));

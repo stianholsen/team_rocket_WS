@@ -1186,11 +1186,6 @@
         <translation>Fichier:</translation>
     </message>
     <message>
-        <source>Create a new file automatically after…</source>
-        <oldsource>Create a new file automatically after...</oldsource>
-        <translation>Créer un nouveau fichier automatiquement après...</translation>
-    </message>
-    <message>
         <source>megabytes</source>
         <oldsource>Megabytes</oldsource>
         <translation>mégaoctets</translation>
@@ -1284,26 +1279,41 @@
         <translation>Capturer vers un fichier permanent</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Instead of using a single capture file, multiple files will be created.&lt;/p&gt;&lt;p&gt;The generated file names will contain an incrementing number and the start time of the capture.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Au lieu d&apos;utiliser un fichier de capture unique, plusieurs fichiers seront créés.&lt;/p&gt;&lt;p&gt;Les noms des fichiers générés contiendront un incrément et le temps de départ de la capture.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If the selected file size is exceeded, capturing switches to the next file.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: One option MUST be selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si la taille de fichier sélectionnée est dépassée, la capture passe au fichier suivant.&lt;/p&gt;&lt;p&gt;NOTE: Une option DOIT être sélectionnée.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>If the selected file size is exceeded, capturing switches to the next file.
-PLEASE NOTE: One option MUST be selected.</source>
-        <translation>Si la taille de fichier sélectionnée est dépassée, la capture passe au fichier suivant.
-NOTE: Une option DOIT être sélectionnée.</translation>
-    </message>
-    <message>
         <source>gigabytes</source>
         <oldsource>Gigabytes</oldsource>
         <translation>gigaoctets</translation>
     </message>
     <message>
         <source>Switch to the next file after the specified number of packets have been captured.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Instead of using a single capture file, multiple files will be created.&lt;/p&gt;&lt;p&gt;The generated file names will contain an incrementing number and the start time of the capture.&lt;/p&gt;&lt;p&gt;NOTE: If enabled, at least one of the new-file criteria MUST be selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create a new file automatically…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>after</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the next file after the file size exceeds the specified file size.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the next file when the time capturing to the current file exceeds the specified time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>when time is a multiple of</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the next file when the (wall clock) time is an even multiple of the specified interval.
+For example, use 1 hour to have a new file created every hour on the hour.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8284,10 +8294,6 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
 <context>
     <name>PluginListModel</name>
     <message>
-        <source>extcap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation type="unfinished">Nom</translation>
     </message>
@@ -8458,6 +8464,10 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
     </message>
     <message>
         <source>(system provided)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(deleted)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -12729,11 +12739,11 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
         <source>&lt;html&gt;&lt;head&gt;
 &lt;style&gt;
 a:link {
-  color: inherit;
+  color: palette(text);
   text-decoration: none;
 }
 a:hover {
-  color: inherit;
+  color: palette(text);
   text-decoration: underline;
 }
 &lt;/style&gt;

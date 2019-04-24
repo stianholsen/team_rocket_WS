@@ -9,7 +9,7 @@
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
  *
- * References: 3GPP TS 24.301 V15.5.0 (2018-12)
+ * References: 3GPP TS 24.301 V15.6.0 (2019-03)
  */
 
 #include "config.h"
@@ -1953,7 +1953,7 @@ de_emm_trac_area_id_lst(tvbuff_t *tvb, proto_tree *tree, packet_info *pinfo,
                 curr_offset+=2;
                 for (i = 1; i < n_elem; i++) {
                     it = proto_tree_add_uint(tree, hf_nas_eps_emm_tai_tac, tvb, curr_offset, 0, tac+i);
-                    PROTO_ITEM_SET_GENERATED(it);
+                    proto_item_set_generated(it);
                 }
                 break;
             case 2:
@@ -2322,7 +2322,6 @@ de_emm_ext_emerg_num_list(tvbuff_t *tvb, proto_tree *tree, packet_info *pinfo _U
                                      tvb, curr_offset, 1, ENC_NA, &length);
         curr_offset++;
         if (length > 0) {
-            /* What is the exact encoding? For now, assume 7bits GSM */
             proto_tree_add_ts_23_038_7bits_item(sub_tree, hf_eps_emm_ext_emerg_num_list_sub_serv_field,
                                                 tvb, curr_offset<<3, (length<<3)/7);
             curr_offset += length;

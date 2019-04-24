@@ -2567,25 +2567,25 @@ pnio_ar_info(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pnio_ar_t *ar)
             address_to_str(wmem_packet_scope(), &controllermac_addr), ar->controlleralarmref,
             address_to_str(wmem_packet_scope(), &devicemac_addr), ar->devicealarmref,
             ar->inputframeid, ar->outputframeid);
-        PROTO_ITEM_SET_GENERATED(sub_item);
+        proto_item_set_generated(sub_item);
 
         item = proto_tree_add_guid(sub_tree, hf_pn_io_ar_uuid, tvb, 0, 0, (e_guid_t *) &ar->aruuid);
-        PROTO_ITEM_SET_GENERATED(item);
+        proto_item_set_generated(item);
 
         item = proto_tree_add_ether(sub_tree, hf_pn_io_cminitiator_macadd, tvb, 0, 0, ar->controllermac);
-        PROTO_ITEM_SET_GENERATED(item);
+        proto_item_set_generated(item);
         item = proto_tree_add_uint(sub_tree, hf_pn_io_localalarmref, tvb, 0, 0, ar->controlleralarmref);
-        PROTO_ITEM_SET_GENERATED(item);
+        proto_item_set_generated(item);
 
         item = proto_tree_add_ether(sub_tree, hf_pn_io_cmresponder_macadd, tvb, 0, 0, ar->devicemac);
-        PROTO_ITEM_SET_GENERATED(item);
+        proto_item_set_generated(item);
         item = proto_tree_add_uint(sub_tree, hf_pn_io_localalarmref, tvb, 0, 0, ar->devicealarmref);
-        PROTO_ITEM_SET_GENERATED(item);
+        proto_item_set_generated(item);
 
         item = proto_tree_add_uint(sub_tree, hf_pn_io_frame_id, tvb, 0, 0, ar->inputframeid);
-        PROTO_ITEM_SET_GENERATED(item);
+        proto_item_set_generated(item);
         item = proto_tree_add_uint(sub_tree, hf_pn_io_frame_id, tvb, 0, 0, ar->outputframeid);
-        PROTO_ITEM_SET_GENERATED(item);
+        proto_item_set_generated(item);
     }
 }
 
@@ -2596,9 +2596,6 @@ static int dissect_block(tvbuff_t *tvb, int offset,
     packet_info *pinfo, proto_tree *tree, guint8 *drep, guint16 *u16Index, guint32 *u32RecDataLen, pnio_ar_t **ar);
 
 static int dissect_a_block(tvbuff_t *tvb, int offset,
-    packet_info *pinfo, proto_tree *tree, guint8 *drep);
-
-int dissect_blocks(tvbuff_t *tvb, int offset,
     packet_info *pinfo, proto_tree *tree, guint8 *drep);
 
 static int dissect_PNIO_IOxS(tvbuff_t *tvb, int offset,
@@ -13869,22 +13866,22 @@ proto_register_pn_io (void)
     },
     { &hf_pn_io_am_device_identification_device_sub_id,
         { "AM_DeviceIdentification.DeviceSubID", "pn_io.am_device_identification.device_sub_id",
-          FT_UINT64, BASE_HEX, NULL, 0xFFFF000000000000,
+          FT_UINT64, BASE_HEX, NULL, 0x000000000000FFFF,
           NULL, HFILL }
     },
     { &hf_pn_io_am_device_identification_device_id,
         { "AM_DeviceIdentification.DeviceID", "pn_io.am_device_identification.device_id",
-          FT_UINT64, BASE_HEX, NULL, 0x0000FFFF00000000,
+          FT_UINT64, BASE_HEX, NULL, 0x00000000FFFF0000,
           NULL, HFILL }
     },
     { &hf_pn_io_am_device_identification_vendor_id,
         { "AM_DeviceIdentification.VendorID", "pn_io.am_device_identification.vendor_id",
-          FT_UINT64, BASE_HEX, NULL, 0x00000000FFFF0000,
+          FT_UINT64, BASE_HEX, NULL, 0x0000FFFF00000000,
           NULL, HFILL }
     },
     { &hf_pn_io_am_device_identification_organization,
         { "AM_DeviceIdentification.Organization", "pn_io.am_device_identification.organization",
-          FT_UINT64, BASE_HEX, NULL, 0x000000000000FFFF,
+          FT_UINT64, BASE_HEX, NULL, 0xFFFF000000000000,
           NULL, HFILL }
     },
     { &hf_pn_io_rs_adjust_info,

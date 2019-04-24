@@ -110,6 +110,8 @@ if(WIN32)
 		message(FATAL_ERROR "Windows setup (win-setup.ps1) failed.")
 	endif()
 
+	set(EXTRA_INSTALLER_DIR ${_ws_lib_dir})
+
 	# XXX Add a dependency on ${_ws_lib_dir}/current_tag.txt?
 
 	# Prepopulate some ConfigureChecks values. Compilation checks
@@ -656,11 +658,6 @@ else() # ! MSVC
 			#
 			-Wredundant-decls
 			#
-			# Some loops are safe, but it's hard to convince the
-			# compiler of that.
-			#
-			-Wunsafe-loop-optimizations
-			#
 			# All the registration functions block these for now.
 			#
 			-Wmissing-prototypes
@@ -693,6 +690,16 @@ else() # ! MSVC
 			#
 			-fno-delete-null-pointer-checks
 		)
+
+		#
+		# Some loops are safe, but it's hard to convince the compiler of
+		# that. Always disable the warning on GCC 7 due to a bug that
+		# cause lots of false positives.
+		# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81408
+		#
+		if(CMAKE_C_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_C_COMPILER_VERSION MATCHES "^7\\.")
+			list(APPEND WIRESHARK_COMMON_FLAGS -Wunsafe-loop-optimizations)
+		endif()
 
 		list(APPEND WIRESHARK_C_ONLY_FLAGS
 			# The following are C only, not C++
@@ -992,9 +999,8 @@ endmacro()
 
 # The minimum package list
 find_package(Git)
-set(GLIB2_MIN_VERSION 2.32.0)
 reset_find_package(GLIB2 GLIB2_MAIN_INCLUDE_DIR GLIB2_INTERNAL_INCLUDE_DIR)
-find_package(GLIB2 REQUIRED)
+find_package(GLIB2 "2.32.0" REQUIRED)
 include_directories(SYSTEM ${GLIB2_INCLUDE_DIRS})
 reset_find_package(GMODULE2)
 find_package(GMODULE2)
@@ -1096,31 +1102,7 @@ ws_find_package(KERBEROS ENABLE_KERBEROS HAVE_KERBEROS)
 ws_find_package(CARES ENABLE_CARES HAVE_C_ARES "1.5.0")
 
 # Zlib compression
-if(ENABLE_ZLIB)
-	if (WIN32)
-		# On Windows we build our own version of zlib, so add the paths
-		set(ZLIB_SRC_DIR "${_PROJECT_LIB_DIR}/zlib-1.2.11-2-ws")
-		set(SKIP_INSTALL_STATIC True)
-		set(SKIP_INSTALL_HEADERS True)
-		set(SKIP_INSTALL_FILES True)
-		set(ZLIB_EXPORTS "WiresharkTargets")
-		add_subdirectory("${ZLIB_SRC_DIR}" "${CMAKE_BINARY_DIR}/zlib")
-		unset(SKIP_INSTALL_STATIC)
-		unset(SKIP_INSTALL_HEADERS)
-		unset(SKIP_INSTALL_FILES)
-		set(ZLIB_INCLUDE_DIR  "${ZLIB_SRC_DIR}" "${CMAKE_BINARY_DIR}/zlib")
-		set(ZLIB_LIBRARY zlib)
-		set(ZLIB_DLL "zlib1.dll")
-		set_target_properties(zlib PROPERTIES FOLDER "Libs/zlib")
-		# Annoyingly zlib also builds some other stuff we aren't interested in
-		set_target_properties(zlibstatic PROPERTIES
-			FOLDER "Libs/zlib"
-			EXCLUDE_FROM_ALL True
-			EXCLUDE_FROM_DEFAULT_BUILD True
-		)
-	endif()
-	ws_find_package(ZLIB ENABLE_ZLIB HAVE_ZLIB)
-endif()
+ws_find_package(ZLIB ENABLE_ZLIB HAVE_ZLIB)
 
 # LZ4 compression
 ws_find_package(LZ4 ENABLE_LZ4 HAVE_LZ4)
@@ -1169,7 +1151,7 @@ endif()
 # Windows version updates
 ws_find_package(WINSPARKLE ENABLE_WINSPARKLE HAVE_SOFTWARE_UPDATE)
 
-find_package(POD)
+find_package(POD REQUIRED)
 
 find_package(DOXYGEN)
 
@@ -1715,13 +1697,11 @@ if(WIN32)
 	# XXX Can (and should) we iterate over these similar to the way
 	# the top-level CMakeLists.txt iterates over the package list?
 
-	# Required DLLs.
-	# The gio, gnutls, png, and other OBS-generated DLLs depend on
-	# zlib1.dll. We compile zlib locally but the Debug configuration
-	# (the default) creates zlibd1.dll.
+	# Required DLLs and their corresponding PDBs.
 	add_custom_command(TARGET copy_cli_dlls PRE_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			${GLIB2_DLLS} $<$<CONFIG:Debug>:zlib1.dll>
+			${GLIB2_DLLS}
+			${GLIB2_PDBS}
 			"${_dll_output_dir}"
 		WORKING_DIRECTORY "${GLIB2_DLL_DIR}"
 	)
@@ -1756,6 +1736,7 @@ if(WIN32)
 	endif(LUA_FOUND)
 	if (LZ4_FOUND)
 		list (APPEND OPTIONAL_DLLS "${LZ4_DLL_DIR}/${LZ4_DLL}")
+		list (APPEND OPTIONAL_PDBS "${LZ4_DLL_DIR}/${LZ4_PDB}")
 	endif(LZ4_FOUND)
 	if (NGHTTP2_FOUND)
 		list (APPEND OPTIONAL_DLLS "${NGHTTP2_DLL_DIR}/${NGHTTP2_DLL}")
@@ -1770,7 +1751,12 @@ if(WIN32)
 		list (APPEND OPTIONAL_DLLS "${BCG729_DLL_DIR}/${BCG729_DLL}")
 	endif(BCG729_FOUND)
 	if (LIBXML2_FOUND)
-		list (APPEND OPTIONAL_DLLS "${LIBXML2_DLL_DIR}/${LIBXML2_DLL}")
+		foreach( _dll ${LIBXML2_DLLS} )
+			list (APPEND OPTIONAL_DLLS "${LIBXML2_DLL_DIR}/${_dll}")
+		endforeach(_dll)
+		foreach( _pdb ${LIBXML2_PDBS} )
+			list (APPEND OPTIONAL_PDBS "${LIBXML2_DLL_DIR}/${_pdb}")
+		endforeach(_pdb)
 	endif(LIBXML2_FOUND)
 	if (SMI_FOUND)
 		list (APPEND OPTIONAL_DLLS "${SMI_DLL_DIR}/${SMI_DLL}")
@@ -1819,6 +1805,10 @@ if(WIN32)
 	if (WINSPARKLE_FOUND)
 		list (APPEND OPTIONAL_DLLS "${WINSPARKLE_DLL_DIR}/${WINSPARKLE_DLL}")
 	endif(WINSPARKLE_FOUND)
+	if (ZLIB_FOUND)
+		list (APPEND OPTIONAL_DLLS "${ZLIB_DLL_DIR}/${ZLIB_DLL}")
+		list (APPEND OPTIONAL_PDBS "${ZLIB_DLL_DIR}/${ZLIB_PDB}")
+	endif(ZLIB_FOUND)
 
 	# With libs downloaded to c:/wireshark-win64-libs this currently
 	# (early 2018) expands to about 1900 characters.
@@ -2867,21 +2857,23 @@ set(CLEAN_C_FILES
 	${mmdbresolve_FILES}
 )
 
-# Make sure we don't pass /WX to rc.exe. Rc doesn't have a /WX flag,
-# but it does have /W (warn about invalid code pages) and /X (ignore
-# the INCLUDE environment variable).
-# This should apparently be handled for us via CMAKE_RC_FLAG_REGEX
-# in CMakeRCInformation.cmake but that doesn't appear to work.
-if (WIN32)
-	list(FILTER CLEAN_C_FILES EXCLUDE REGEX ".*\\.rc")
-endif (WIN32)
+if(CLEAN_C_FILES)
+	# Make sure we don't pass /WX to rc.exe. Rc doesn't have a /WX flag,
+	# but it does have /W (warn about invalid code pages) and /X (ignore
+	# the INCLUDE environment variable).
+	# This should apparently be handled for us via CMAKE_RC_FLAG_REGEX
+	# in CMakeRCInformation.cmake but that doesn't appear to work.
+	if(WIN32)
+		list(FILTER CLEAN_C_FILES EXCLUDE REGEX ".*\\.rc")
+	endif()
 
-# XXX This also contains object files ($<TARGET_OBJECTS:...>), is that an issue?
-set_source_files_properties(
-	${CLEAN_C_FILES}
-	PROPERTIES
-	COMPILE_FLAGS "${WERROR_COMMON_FLAGS}"
-)
+	# XXX This also contains object files ($<TARGET_OBJECTS:...>), is that an issue?
+	set_source_files_properties(
+		${CLEAN_C_FILES}
+		PROPERTIES
+		COMPILE_FLAGS "${WERROR_COMMON_FLAGS}"
+	)
+endif()
 
 install(
 	FILES

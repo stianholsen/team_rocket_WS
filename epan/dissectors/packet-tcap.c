@@ -755,7 +755,7 @@ dissect_tcap_OrigTransactionID(gboolean implicit_tag _U_, tvbuff_t *tvb _U_, int
   offset = dissect_ber_tagged_type(implicit_tag, actx, tree, tvb, offset,
                                       hf_index, BER_CLASS_APP, 8, TRUE, dissect_tcap_OCTET_STRING_SIZE_1_4);
 
-  PROTO_ITEM_SET_GENERATED(actx->created_item);
+  proto_item_set_generated(actx->created_item);
   offset = saved_offset;
 
   subtree = proto_tree_add_subtree(tree, tvb, offset, -1, ett_otid, NULL, "Source Transaction ID");
@@ -842,7 +842,7 @@ dissect_tcap_DestTransactionID(gboolean implicit_tag _U_, tvbuff_t *tvb _U_, int
   offset = dissect_ber_tagged_type(implicit_tag, actx, tree, tvb, offset,
                                       hf_index, BER_CLASS_APP, 9, TRUE, dissect_tcap_OCTET_STRING_SIZE_1_4);
 
-  PROTO_ITEM_SET_GENERATED(actx->created_item);
+  proto_item_set_generated(actx->created_item);
   offset = saved_offset;
 
   subtree = proto_tree_add_subtree(tree, tvb, offset, -1, ett_dtid, NULL, "Destination Transaction ID");
@@ -1018,15 +1018,15 @@ dissect_tcap_TCMessage(gboolean implicit_tag _U_, tvbuff_t *tvb _U_, int offset 
 }
 
 
-static const asn_namedbit AUDT_protocol_version_bits[] = {
-  {  0, &hf_tcap_AUDT_protocol_version_version1, -1, -1, "version1", NULL },
-  { 0, NULL, 0, 0, NULL, NULL }
+static const int * AUDT_protocol_version_bits[] = {
+  &hf_tcap_AUDT_protocol_version_version1,
+  NULL
 };
 
 static int
 dissect_tcap_AUDT_protocol_version(gboolean implicit_tag _U_, tvbuff_t *tvb _U_, int offset _U_, asn1_ctx_t *actx _U_, proto_tree *tree _U_, int hf_index _U_) {
   offset = dissect_ber_bitstring(implicit_tag, actx, tree, tvb, offset,
-                                    AUDT_protocol_version_bits, hf_index, ett_tcap_AUDT_protocol_version,
+                                    AUDT_protocol_version_bits, 1, hf_index, ett_tcap_AUDT_protocol_version,
                                     NULL);
 
   return offset;
@@ -1118,15 +1118,15 @@ dissect_tcap_UniDialoguePDU(gboolean implicit_tag _U_, tvbuff_t *tvb _U_, int of
 }
 
 
-static const asn_namedbit AARQ_protocol_version_bits[] = {
-  {  0, &hf_tcap_AARQ_protocol_version_version1, -1, -1, "version1", NULL },
-  { 0, NULL, 0, 0, NULL, NULL }
+static const int * AARQ_protocol_version_bits[] = {
+  &hf_tcap_AARQ_protocol_version_version1,
+  NULL
 };
 
 static int
 dissect_tcap_AARQ_protocol_version(gboolean implicit_tag _U_, tvbuff_t *tvb _U_, int offset _U_, asn1_ctx_t *actx _U_, proto_tree *tree _U_, int hf_index _U_) {
   offset = dissect_ber_bitstring(implicit_tag, actx, tree, tvb, offset,
-                                    AARQ_protocol_version_bits, hf_index, ett_tcap_AARQ_protocol_version,
+                                    AARQ_protocol_version_bits, 1, hf_index, ett_tcap_AARQ_protocol_version,
                                     NULL);
 
   return offset;
@@ -1189,15 +1189,15 @@ dissect_tcap_AARQ_apdu(gboolean implicit_tag _U_, tvbuff_t *tvb _U_, int offset 
 }
 
 
-static const asn_namedbit AARE_protocol_version_bits[] = {
-  {  0, &hf_tcap_AARE_protocol_version_version1, -1, -1, "version1", NULL },
-  { 0, NULL, 0, 0, NULL, NULL }
+static const int * AARE_protocol_version_bits[] = {
+  &hf_tcap_AARE_protocol_version_version1,
+  NULL
 };
 
 static int
 dissect_tcap_AARE_protocol_version(gboolean implicit_tag _U_, tvbuff_t *tvb _U_, int offset _U_, asn1_ctx_t *actx _U_, proto_tree *tree _U_, int hf_index _U_) {
   offset = dissect_ber_bitstring(implicit_tag, actx, tree, tvb, offset,
-                                    AARE_protocol_version_bits, hf_index, ett_tcap_AARE_protocol_version,
+                                    AARE_protocol_version_bits, 1, hf_index, ett_tcap_AARE_protocol_version,
                                     NULL);
 
   return offset;
@@ -2235,12 +2235,12 @@ tcaphash_begin_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
             p_tcaphash_context=p_tcaphash_begincall->context;
             if (gtcap_DisplaySRT && tree) {
               stat_tree = proto_tree_add_subtree(tree, tvb, 0, -1, ett_tcap_stat, &stat_item, "Stat");
-              PROTO_ITEM_SET_GENERATED(stat_item);
+              proto_item_set_generated(stat_item);
               pi = proto_tree_add_uint_format(stat_tree, hf_tcapsrt_Duplicate, tvb, 0, 0,
                                               p_tcaphash_context->first_frame,
                                               "Duplicate with session %u in frame %u",
                                               p_tcaphash_context->session_id,p_tcaphash_context->first_frame);
-              PROTO_ITEM_SET_GENERATED(pi);
+              proto_item_set_generated(pi);
             }
             return p_tcaphash_context;
           } /* Previous session closed */
@@ -2277,9 +2277,9 @@ tcaphash_begin_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
        p_tcaphash_context &&
        p_tcaphash_context->session_id) {
     stat_tree = proto_tree_add_subtree(tree, tvb, 0, 0, ett_tcap_stat, &stat_item, "Stat");
-    PROTO_ITEM_SET_GENERATED(stat_item);
+    proto_item_set_generated(stat_item);
     pi = proto_tree_add_uint(stat_tree, hf_tcapsrt_SessionId, tvb, 0,0, p_tcaphash_context->session_id);
-    PROTO_ITEM_SET_GENERATED(pi);
+    proto_item_set_generated(pi);
 
     /* add link to response frame, if available */
     /* p_tcaphash_begincall->context->last_frame) */
@@ -2291,7 +2291,7 @@ tcaphash_begin_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
                                       p_tcaphash_context->last_frame,
                                       "End of session in frame %u",
                                       p_tcaphash_context->last_frame);
-      PROTO_ITEM_SET_GENERATED(pi);
+      proto_item_set_generated(pi);
     }
   }
   return p_tcaphash_context;
@@ -2451,9 +2451,9 @@ tcaphash_cont_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
       p_tcaphash_context &&
       p_tcaphash_context->session_id) {
     stat_tree = proto_tree_add_subtree(tree, tvb, 0, -1, ett_tcap_stat, &stat_item, "Stat");
-    PROTO_ITEM_SET_GENERATED(stat_item);
+    proto_item_set_generated(stat_item);
     pi = proto_tree_add_uint(stat_tree, hf_tcapsrt_SessionId, tvb, 0,0, p_tcaphash_context->session_id);
-    PROTO_ITEM_SET_GENERATED(pi);
+    proto_item_set_generated(pi);
   }
 
   return p_tcaphash_context;
@@ -2553,10 +2553,10 @@ tcaphash_end_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
 #endif
     if (gtcap_DisplaySRT && tree) {
       stat_tree = proto_tree_add_subtree(tree, tvb, 0, -1, ett_tcap_stat, &stat_item, "Stat");
-      PROTO_ITEM_SET_GENERATED(stat_item);
+      proto_item_set_generated(stat_item);
 
       pi = proto_tree_add_uint(stat_tree, hf_tcapsrt_SessionId, tvb, 0,0, p_tcaphash_context->session_id);
-      PROTO_ITEM_SET_GENERATED(pi);
+      proto_item_set_generated(pi);
     }
 
 #ifdef DEBUG_TCAPSRT
@@ -2568,13 +2568,13 @@ tcaphash_end_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
                                       p_tcaphash_context->first_frame,
                                       "Begin of session in frame %u",
                                       p_tcaphash_context->first_frame);
-      PROTO_ITEM_SET_GENERATED(pi);
+      proto_item_set_generated(pi);
       /* Calculate Service Response Time */
       nstime_delta(&delta, &pinfo->abs_ts, &p_tcaphash_context->begin_time);
 
       /* display Service Response Time and make it filterable */
       pi = proto_tree_add_time(stat_tree, hf_tcapsrt_SessionTime, tvb, 0, 0, &delta);
-      PROTO_ITEM_SET_GENERATED(pi);
+      proto_item_set_generated(pi);
     }
     /* Close the context and remove it (if needed) */
     tcapsrt_close(p_tcaphash_context,pinfo);
@@ -2676,10 +2676,10 @@ tcaphash_ansi_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
 
         if (gtcap_DisplaySRT && tree) {
           stat_tree = proto_tree_add_subtree(tree, tvb, 0, -1, ett_tcap_stat, &stat_item, "Stat");
-          PROTO_ITEM_SET_GENERATED(stat_item);
+          proto_item_set_generated(stat_item);
 
           pi = proto_tree_add_uint(stat_tree, hf_tcapsrt_SessionId, tvb, 0,0, p_tcaphash_context->session_id);
-          PROTO_ITEM_SET_GENERATED(pi);
+          proto_item_set_generated(pi);
 
 #ifdef DEBUG_TCAPSRT
           dbg(20,"Display framereqlink %d ",p_tcaphash_context->first_frame);
@@ -2689,13 +2689,13 @@ tcaphash_ansi_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
                                           p_tcaphash_context->first_frame,
                                           "Begin of session in frame %u",
                                           p_tcaphash_context->first_frame);
-          PROTO_ITEM_SET_GENERATED(pi);
+          proto_item_set_generated(pi);
           /* Calculate Service Response Time */
           nstime_delta(&delta, &pinfo->abs_ts, &p_tcaphash_context->begin_time);
 
           /* display Service Response Time and make it filterable */
           pi = proto_tree_add_time(stat_tree, hf_tcapsrt_SessionTime, tvb, 0, 0, &delta);
-          PROTO_ITEM_SET_GENERATED(pi);
+          proto_item_set_generated(pi);
         }
         break;
       } /* Lastframe=0, so take it */
@@ -2768,10 +2768,10 @@ tcaphash_ansi_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
 
             if (gtcap_DisplaySRT && tree) {
               stat_tree = proto_tree_add_subtree(tree, tvb, 0, -1, ett_tcap_stat, &stat_item, "Stat");
-              PROTO_ITEM_SET_GENERATED(stat_item);
+              proto_item_set_generated(stat_item);
 
               pi = proto_tree_add_uint(stat_tree, hf_tcapsrt_SessionId, tvb, 0,0, p_tcaphash_context->session_id);
-              PROTO_ITEM_SET_GENERATED(pi);
+              proto_item_set_generated(pi);
 
 #ifdef DEBUG_TCAPSRT
               dbg(20,"Display framereqlink %d ",p_tcaphash_context->first_frame);
@@ -2781,13 +2781,13 @@ tcaphash_ansi_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
                                               p_tcaphash_context->first_frame,
                                               "Begin of session in frame %u",
                                               p_tcaphash_context->first_frame);
-              PROTO_ITEM_SET_GENERATED(pi);
+              proto_item_set_generated(pi);
               /* Calculate Service Response Time */
               nstime_delta(&delta, &pinfo->abs_ts, &p_tcaphash_context->begin_time);
 
               /* display Service Response Time and make it filterable */
               pi = proto_tree_add_time(stat_tree, hf_tcapsrt_SessionTime, tvb, 0, 0, &delta);
-              PROTO_ITEM_SET_GENERATED(pi);
+              proto_item_set_generated(pi);
             }
             p_tcaphash_context=p_tcaphash_ansicall->context;
           } /* test with Timeout */
@@ -2820,9 +2820,9 @@ tcaphash_ansi_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
        p_tcaphash_context &&
        p_tcaphash_context->session_id) {
     stat_tree = proto_tree_add_subtree(tree, tvb, 0, -1, ett_tcap_stat, &stat_item, "Stat");
-    PROTO_ITEM_SET_GENERATED(stat_item);
+    proto_item_set_generated(stat_item);
     pi = proto_tree_add_uint(stat_tree, hf_tcapsrt_SessionId, tvb, 0,0, p_tcaphash_context->session_id);
-    PROTO_ITEM_SET_GENERATED(pi);
+    proto_item_set_generated(pi);
   }
 
 
@@ -2837,7 +2837,7 @@ tcaphash_ansi_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
                                       p_tcaphash_ansicall->context->last_frame,
                                       "End of session in frame %u",
                                       p_tcaphash_ansicall->context->last_frame);
-      PROTO_ITEM_SET_GENERATED(pi);
+      proto_item_set_generated(pi);
     } else { /* Response */
 #ifdef DEBUG_TCAPSRT
       dbg(20,"Display framereqlink %d ",p_tcaphash_context->first_frame);
@@ -2848,13 +2848,13 @@ tcaphash_ansi_matching(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
                                         p_tcaphash_context->first_frame,
                                         "Begin of session in frame %u",
                                         p_tcaphash_context->first_frame);
-        PROTO_ITEM_SET_GENERATED(pi);
+        proto_item_set_generated(pi);
         /* Calculate Service Response Time */
         nstime_delta(&delta, &pinfo->abs_ts, &p_tcaphash_context->begin_time);
 
         /* display Service Response Time and make it filterable */
         pi = proto_tree_add_time(stat_tree, hf_tcapsrt_SessionTime, tvb, 0, 0, &delta);
-        PROTO_ITEM_SET_GENERATED(pi);
+        proto_item_set_generated(pi);
       }
     } /* Request or Response */
   }
@@ -3545,15 +3545,15 @@ proto_register_tcap(void)
         FT_INT32, BASE_DEC, VALS(tcap_T_dialogue_service_provider_vals), 0,
         NULL, HFILL }},
     { &hf_tcap_AUDT_protocol_version_version1,
-      { "version1", "tcap.version1",
+      { "version1", "tcap.AUDT.protocol.version.version1",
         FT_BOOLEAN, 8, NULL, 0x80,
         NULL, HFILL }},
     { &hf_tcap_AARQ_protocol_version_version1,
-      { "version1", "tcap.version1",
+      { "version1", "tcap.AARQ.protocol.version.version1",
         FT_BOOLEAN, 8, NULL, 0x80,
         NULL, HFILL }},
     { &hf_tcap_AARE_protocol_version_version1,
-      { "version1", "tcap.version1",
+      { "version1", "tcap.AARE.protocol.version.version1",
         FT_BOOLEAN, 8, NULL, 0x80,
         NULL, HFILL }},
 

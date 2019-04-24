@@ -339,6 +339,7 @@ libwireshark.so.0 libwireshark0 #MINVER#
  dissect_h225_ReleaseCompleteReason@Base 1.9.1
  dissect_h245_H223Capability@Base 1.9.1
  dissect_isup_called_party_number_parameter@Base 1.9.1
+ dissect_isup_calling_geodetic_location_parameter@Base 3.1.0
  dissect_isup_calling_party_number_parameter@Base 1.9.1
  dissect_isup_original_called_number_parameter@Base 1.9.1
  dissect_isup_redirecting_number_parameter@Base 1.9.1
@@ -845,6 +846,7 @@ libwireshark.so.0 libwireshark0 #MINVER#
  get_utf_16_string@Base 1.12.0~rc1
  get_vlan_hash_table@Base 2.1.0
  get_wka_hashtable@Base 1.12.0~rc1
+ giop_add_CDR_string@Base 3.1.0
  golay_decode@Base 1.9.1
  golay_encode@Base 1.9.1
  golay_errors@Base 1.9.1
@@ -1131,10 +1133,17 @@ libwireshark.so.0 libwireshark0 #MINVER#
  proto_item_get_parent@Base 1.9.1
  proto_item_get_parent_nth@Base 1.9.1
  proto_item_get_subtree@Base 1.9.1
+ proto_item_is_hidden@Base 3.1.0
+ proto_item_is_generated@Base 3.1.0
+ proto_item_is_url@Base 3.1.0
  proto_item_prepend_text@Base 1.9.1
  proto_item_set_end@Base 1.9.1
+ proto_item_set_hidden@Base 3.1.0
+ proto_item_set_generated@Base 3.1.0
  proto_item_set_len@Base 1.9.1
  proto_item_set_text@Base 1.9.1
+ proto_item_set_url@Base 3.1.0
+ proto_item_set_visible@Base 3.1.0
  proto_name_already_registered@Base 2.0.1
  proto_node_group_children_by_json_key@Base 2.5.0
  proto_node_group_children_by_unique@Base 2.5.0

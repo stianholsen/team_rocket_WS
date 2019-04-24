@@ -758,6 +758,10 @@ set(DISSECTOR_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-btle.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-btle_rf.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-btmesh.c
+	${CMAKE_CURRENT_SOURCE_DIR}/packet-btmesh-pbadv.c
+	${CMAKE_CURRENT_SOURCE_DIR}/packet-btmesh-provisioning.c
+	${CMAKE_CURRENT_SOURCE_DIR}/packet-btmesh-beacon.c
+	${CMAKE_CURRENT_SOURCE_DIR}/packet-btmesh-proxy.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-btmcap.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-btrfcomm.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-btsap.c
@@ -892,9 +896,11 @@ set(DISSECTOR_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcm.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcom-dispatch.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcom-oxid.c
+	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcom-provideclassinfo.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcom-remact.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcom-remunkn.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcom-sysact.c
+	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcom-typeinfo.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcom.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dcp-etsi.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-ddtp.c
@@ -929,6 +935,7 @@ set(DISSECTOR_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dpnet.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dpnss-link.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dpnss.c
+	${CMAKE_CURRENT_SOURCE_DIR}/packet-drbd.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-drda.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-drb.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-dsi.c
@@ -961,9 +968,11 @@ set(DISSECTOR_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-echo.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-ecmp.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-ecp.c
+	${CMAKE_CURRENT_SOURCE_DIR}/packet-ecpri.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-ecp-oui.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-edonkey.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-egd.c
+	${CMAKE_CURRENT_SOURCE_DIR}/packet-eero.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-ehdlc.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-ehs.c
 	${CMAKE_CURRENT_SOURCE_DIR}/packet-eigrp.c

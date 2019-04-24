@@ -170,7 +170,7 @@ proto_tree_print_node(proto_node *node, gpointer data)
     g_assert(fi);
 
     /* Don't print invisible entries. */
-    if (PROTO_ITEM_IS_HIDDEN(node) && (prefs.display_hidden_proto_items == FALSE))
+    if (proto_item_is_hidden(node) && (prefs.display_hidden_proto_items == FALSE))
         return;
 
     /* Give up if we've already gotten an error. */
@@ -186,12 +186,12 @@ proto_tree_print_node(proto_node *node, gpointer data)
         proto_item_fill_label(fi, label_str);
     }
 
-    if (PROTO_ITEM_IS_GENERATED(node))
+    if (proto_item_is_generated(node))
         label_ptr = g_strconcat("[", label_ptr, "]", NULL);
 
     pdata->success = print_line(pdata->stream, pdata->level, label_ptr);
 
-    if (PROTO_ITEM_IS_GENERATED(node))
+    if (proto_item_is_generated(node))
         g_free(label_ptr);
 
     if (!pdata->success)
@@ -534,7 +534,7 @@ proto_tree_write_node_pdml(proto_node *node, gpointer data)
             print_escaped_xml(pdata->fh, label_ptr);
         }
 
-        if (PROTO_ITEM_IS_HIDDEN(node) && (prefs.display_hidden_proto_items == FALSE))
+        if (proto_item_is_hidden(node) && (prefs.display_hidden_proto_items == FALSE))
             fprintf(pdata->fh, "\" hide=\"yes");
 
         fprintf(pdata->fh, "\" size=\"%d", fi->length);
@@ -1278,7 +1278,8 @@ ek_write_field_value(field_info *fi, write_json_data* pdata)
     }
     else {
         /* show, value, and unmaskedvalue attributes */
-        if (fi->hfinfo->type == FT_PROTOCOL) {
+        switch(fi->hfinfo->type) {
+        case FT_PROTOCOL:
             if (fi->rep) {
                 json_dumper_value_string(pdata->dumper, fi->rep->representation);
             }
@@ -1286,13 +1287,17 @@ ek_write_field_value(field_info *fi, write_json_data* pdata)
                 proto_item_fill_label(fi, label_str);
                 json_dumper_value_string(pdata->dumper, label_str);
             }
-        }
-        else if (fi->hfinfo->type != FT_NONE) {
+            break;
+        case FT_NONE:
+            json_dumper_value_string(pdata->dumper, NULL);
+            break;
+        default:
             dfilter_string = fvalue_to_string_repr(NULL, &fi->value, FTREPR_DISPLAY, fi->hfinfo->display);
             if (dfilter_string != NULL) {
                 json_dumper_value_string(pdata->dumper, dfilter_string);
             }
             wmem_free(NULL, dfilter_string);
+            break;
         }
     }
 }
